@@ -1,0 +1,441 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module FlowShallow</title>
+<meta name="description" content="Documentation of Coq module FlowShallow" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module FlowShallow</h1>
+<div class="coq">
+<br/>
+<span class="kwd">From</span> <span class="id">Coq</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.ZArith.html">ZArith</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.micromega.Lia.html">Lia</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Bool.Bool.html">Bool</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Lists.List.html">List</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html">String</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Program.Equality.html">Program.Equality</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">CDF</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="CDF.Common.html">Common</a></span> <span class="id"><a href="CDF.Sequences.html">Sequences</a></span> <span class="id"><a href="CDF.Separation2.html">Separation2</a></span> <span class="id"><a href="CDF.Tactics.html">Tactics</a></span> <span class="id"><a href="CDF.HeapTactics.html">HeapTactics</a></span>.<br/>
+<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">string_scope</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">Z_scope</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">list_scope</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="val">val</a></span> := <span class="id"><a href="https://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>.<br/>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="expr">expr</a></span> : <span class="kwd">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="pvar">pvar</a></span> (<span class="id">x</span>: <span class="id"><a href="CDF.Common.html#ident">ident</a></span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="pconst">pconst</a></span> (<span class="id">n</span>: <span class="id"><a href="CDF.FlowShallow.html#val">val</a></span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="plet">plet</a></span> (<span class="id">x</span>: <span class="id"><a href="CDF.Common.html#ident">ident</a></span>) (<span class="id">e1</span>: <span class="id">expr</span>) (<span class="id">e2</span>: <span class="id">expr</span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="pif">pif</a></span> (<span class="id">x</span>: <span class="id"><a href="CDF.Common.html#ident">ident</a></span>) (<span class="id">e1</span>: <span class="id">expr</span>) (<span class="id">e2</span>: <span class="id">expr</span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="pcall">pcall</a></span> (<span class="id">x</span>: <span class="id"><a href="CDF.Common.html#ident">ident</a></span>) (<span class="id">a</span>: <span class="id"><a href="CDF.Common.html#ident">ident</a></span>)<br/>
+&nbsp;&nbsp;.<br/>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="eresult">eresult</a></span> : <span class="kwd">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="enorm">enorm</a></span> : <span class="id"><a href="CDF.FlowShallow.html#val">val</a></span> -&gt; <span class="id">eresult</span><br/>
+.<br/>
+<br/>
+<span class="kwd">Reserved</span> <span class="kwd">Notation</span> " '<span class="id">eval</span>[' <span class="id">s</span> ',' <span class="id">h</span> ',' <span class="id">e</span> ']' '=&gt;' '[' <span class="id">s1</span> ',' <span class="id">h1</span> ',' <span class="id">r</span> ']' " (<span class="kwd">at</span> <span class="id">level</span> 50, <span class="id">left</span> <span class="id">associativity</span>).<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="store">store</a></span> := <span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>.<br/>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="bigstep">bigstep</a></span> : <span class="id"><a href="CDF.FlowShallow.html#store">store</a></span> -&gt; <span class="id"><a href="CDF.Separation2.html#heap">heap</a></span> -&gt; <span class="id"><a href="CDF.FlowShallow.html#expr">expr</a></span> -&gt; <span class="id"><a href="CDF.FlowShallow.html#store">store</a></span> -&gt; <span class="id"><a href="CDF.Separation2.html#heap">heap</a></span> -&gt; <span class="id"><a href="CDF.FlowShallow.html#eresult">eresult</a></span> -&gt; <span class="kwd">Prop</span> :=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_pvar">eval_pvar</a></span> : <span class="kwd">forall</span> <span class="id">s</span> <span class="id">h</span> <span class="id">x</span> <span class="id">v</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> = <span class="id">s</span> <span class="id">x</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.FlowShallow.html#pvar">pvar</a></span> <span class="id">x</span> ]=&gt;[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.FlowShallow.html#enorm">enorm</a></span> <span class="id">v</span>]<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_pconst">eval_pconst</a></span> : <span class="kwd">forall</span> <span class="id">s</span> <span class="id">h</span> <span class="id">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.FlowShallow.html#pconst">pconst</a></span> <span class="id">x</span> ] =&gt; [ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.FlowShallow.html#enorm">enorm</a></span> <span class="id">x</span>]<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_plet">eval_plet</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">e1</span> <span class="id">e2</span> <span class="id">v</span> <span class="id">s</span> <span class="id">h</span> <span class="id">h2</span> <span class="id">s2</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">r</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id">e1</span> ] =&gt; [ <span class="id">s1</span>, <span class="id">h1</span>, <span class="id"><a href="CDF.FlowShallow.html#enorm">enorm</a></span> <span class="id">v</span>] -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s1</span>, <span class="id">h1</span>, <span class="id">e2</span> ] =&gt; [ <span class="id">s2</span>, <span class="id">h2</span>, <span class="id">r</span>] -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.FlowShallow.html#plet">plet</a></span> <span class="id">x</span> <span class="id">e1</span> <span class="id">e2</span> ] =&gt; [ <span class="id">s2</span>, <span class="id">h2</span>, <span class="id">r</span> ]<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">where</span> " '<span class="id">eval</span>[' <span class="id">s</span> ',' <span class="id">h</span> ',' <span class="id">e</span> ']' '=&gt;' '[' <span class="id">s1</span> ',' <span class="id">h1</span> ',' <span class="id">r</span> ']' " := (<span class="id"><a href="CDF.FlowShallow.html#bigstep">bigstep</a></span> <span class="id">s</span> <span class="id">h</span> <span class="id">e</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">r</span>)<br/>
+.<br/>
+<br/>
+<span class="kwd">Module</span> <span class="id"><a name="ProgramExamples">ProgramExamples</a></span>.<br/>
+<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="CDF.FlowShallow.html#ProgramExamples">ProgramExamples</a></span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="precond">precond</a></span> := <span class="id"><a href="CDF.Separation2.html#assertion">assertion</a></span>.<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="postcond">postcond</a></span> := <span class="id"><a href="https://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span> -&gt; <span class="id"><a href="CDF.Separation2.html#assertion">assertion</a></span>.<br/>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="result">result</a></span> : <span class="kwd">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="norm">norm</a></span> : <span class="id"><a href="https://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span> -&gt; <span class="id">result</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="compatible">compatible</a></span> <span class="id">r1</span> <span class="id">r2</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> (<span class="id">r1</span>, <span class="id">r2</span>) <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id"><a href="CDF.FlowShallow.html#norm">norm</a></span> <span class="id">r3</span>, <span class="id"><a href="CDF.FlowShallow.html#enorm">enorm</a></span> <span class="id">r4</span>) =&gt; <span class="id">r3</span> = <span class="id">r4</span><br/>
+&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="flow">flow</a></span> := <span class="id"><a href="CDF.FlowShallow.html#store">store</a></span> -&gt; <span class="id"><a href="CDF.Separation2.html#heap">heap</a></span> -&gt; <span class="id"><a href="CDF.FlowShallow.html#store">store</a></span> -&gt; <span class="id"><a href="CDF.Separation2.html#heap">heap</a></span> -&gt; <span class="id"><a href="CDF.FlowShallow.html#result">result</a></span> -&gt; <span class="kwd">Prop</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="req">req</a></span> : <span class="id"><a href="CDF.FlowShallow.html#precond">precond</a></span> -&gt; <span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span> := <span class="kwd">fun</span> <span class="id">p</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span> =&gt;<br/>
+&nbsp;&nbsp;<span class="id">s1</span> = <span class="id">s2</span> /\<br/>
+&nbsp;&nbsp;<span class="kwd">exists</span> <span class="id">h3</span>, <span class="id">h1</span> = <span class="id"><a href="CDF.Separation2.html#hunion">hunion</a></span> <span class="id">h2</span> <span class="id">h3</span> /\ <span class="id"><a href="CDF.Separation2.html#hdisjoint">hdisjoint</a></span> <span class="id">h2</span> <span class="id">h3</span> /\ <span class="id">p</span> <span class="id">s1</span> <span class="id">h3</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="ens">ens</a></span> : <span class="id"><a href="CDF.FlowShallow.html#postcond">postcond</a></span> -&gt; <span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span> := <span class="kwd">fun</span> <span class="id">q</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span> =&gt;<br/>
+&nbsp;&nbsp;<span class="id">s1</span> = <span class="id">s2</span> /\<br/>
+&nbsp;&nbsp;<span class="kwd">exists</span> <span class="id">v</span>, <span class="id">r</span> = <span class="id"><a href="CDF.FlowShallow.html#norm">norm</a></span> <span class="id">v</span> /\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> <span class="id">h3</span>, <span class="id">h2</span> = <span class="id"><a href="CDF.Separation2.html#hunion">hunion</a></span> <span class="id">h1</span> <span class="id">h3</span> /\ <span class="id"><a href="CDF.Separation2.html#hdisjoint">hdisjoint</a></span> <span class="id">h1</span> <span class="id">h3</span> /\ <span class="id">q</span> <span class="id">v</span> <span class="id">s1</span> <span class="id">h3</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="seq">seq</a></span> : <span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span> -&gt; <span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span> -&gt; <span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span> := <span class="kwd">fun</span> <span class="id">f1</span> <span class="id">f2</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span> =&gt;<br/>
+&nbsp;&nbsp;<span class="kwd">exists</span> <span class="id">s3</span> <span class="id">h3</span> <span class="id">r1</span>,<br/>
+&nbsp;&nbsp;<span class="id">f1</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s3</span> <span class="id">h3</span> <span class="id">r1</span> /\<br/>
+&nbsp;&nbsp;<span class="id">f2</span> <span class="id">s3</span> <span class="id">h3</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span>.<br/>
+<br/>
+<span class="kwd">Infix</span> ";;" := <span class="id"><a href="CDF.FlowShallow.html#seq">seq</a></span> (<span class="kwd">at</span> <span class="id">level</span> 80, <span class="id">right</span> <span class="id">associativity</span>).<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="fexists">fexists</a></span> : <span class="id"><a href="CDF.Common.html#ident">ident</a></span> -&gt; <span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span> -&gt; <span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span> := <span class="kwd">fun</span> <span class="id">i</span> <span class="id">f</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span> =&gt;<br/>
+&nbsp;&nbsp;<span class="id">s1</span> <span class="id">i</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> /\<br/>
+&nbsp;&nbsp;<span class="kwd">exists</span> <span class="id">v</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">f</span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">i</span> <span class="id">v</span> <span class="id">s1</span>) <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="replace_ret">replace_ret</a></span> (<span class="id">x</span>:<span class="id"><a href="CDF.Common.html#ident">ident</a></span>) (<span class="id">f</span>:<span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span>) : <span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span> := <span class="kwd">fun</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span> =&gt;<br/>
+&nbsp;&nbsp;<span class="kwd">exists</span> <span class="id">v</span>, <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> = <span class="id">s1</span> <span class="id">x</span> /\<br/>
+&nbsp;&nbsp;<span class="id">f</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> (<span class="id"><a href="CDF.FlowShallow.html#norm">norm</a></span> <span class="id">v</span>).<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="empty">empty</a></span> := <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> (<span class="kwd">fun</span> <span class="id">r</span> =&gt; <span class="id"><a href="CDF.Separation2.html#pure">pure</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>).<br/>
+<br/>
+<span class="kwd">Ltac</span> <span class="id">fstep</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">goal</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;| <span class="id">H</span> : <span class="id"><a href="CDF.FlowShallow.html#seq">seq</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> |- <span class="id">_</span> =&gt; <span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#seq">seq</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="id">destr</span> <span class="id">H</span><br/>
+&nbsp;&nbsp;| <span class="id">H</span> : <span class="id"><a href="CDF.FlowShallow.html#req">req</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> |- <span class="id">_</span> =&gt; <span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#req">req</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="id">destr</span> <span class="id">H</span>; <span class="id">subst</span><br/>
+&nbsp;&nbsp;| <span class="id">H</span> : <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> |- <span class="id">_</span> =&gt; <span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="id">destr</span> <span class="id">H</span>; <span class="id">subst</span><br/>
+&nbsp;&nbsp;| <span class="id">H</span> : <span class="id"><a href="CDF.Separation2.html#pureconj">pureconj</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> |- <span class="id">_</span> =&gt; <span class="id">unfold</span> <span class="id"><a href="CDF.Separation2.html#pureconj">pureconj</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="id">destr</span> <span class="id">H</span>; <span class="id">subst</span><br/>
+&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Ltac</span> <span class="id">fsteps</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">goal</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;| <span class="id">H</span> : <span class="id"><a href="CDF.FlowShallow.html#seq">seq</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> |- <span class="id">_</span> =&gt; <span class="id">fstep</span>; <span class="id">fsteps</span><br/>
+&nbsp;&nbsp;| <span class="id">H</span> : <span class="id"><a href="CDF.FlowShallow.html#req">req</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> |- <span class="id">_</span> =&gt; <span class="id">fstep</span>; <span class="id">fsteps</span><br/>
+&nbsp;&nbsp;| <span class="id">H</span> : <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> |- <span class="id">_</span> =&gt; <span class="id">fstep</span>; <span class="id">fsteps</span><br/>
+&nbsp;&nbsp;| <span class="id">H</span> : <span class="id"><a href="CDF.Separation2.html#pureconj">pureconj</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> |- <span class="id">_</span> =&gt; <span class="id">fstep</span>; <span class="id">fsteps</span><br/>
+&nbsp;&nbsp;| <span class="id">_</span> =&gt; <span class="id">idtac</span><br/>
+&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="empty_noop">empty_noop</a></span> : <span class="kwd">forall</span> <span class="id">s</span> <span class="id">h</span> <span class="id">r</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.FlowShallow.html#empty">empty</a></span> <span class="id">s</span> <span class="id">h</span> <span class="id">s</span> <span class="id">h</span> (<span class="id"><a href="CDF.FlowShallow.html#norm">norm</a></span> <span class="id">r</span>).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof1')">Proof.</span></div>
+<div class="proofscript" id="proof1">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#empty">empty</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">intuition</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">exists</span> <span class="id">r</span>.<br/>
+&nbsp;&nbsp;<span class="id">intuition</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">exists</span> <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">intuition</span> <span class="id">heap</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation2.html#pure">pure</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">intuition</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Module</span> <span class="id"><a name="SemanticsExamples">SemanticsExamples</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="SemanticsExamples.f1">f1</a></span> : <span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span> := <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> (<span class="kwd">fun</span> <span class="id">r</span> =&gt; <span class="id"><a href="CDF.Separation2.html#pure">pure</a></span> (<span class="id">r</span>=1)).<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="SemanticsExamples.f2">f2</a></span> : <span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span> := <span class="id"><a href="CDF.FlowShallow.html#req">req</a></span> (<span class="kwd">fun</span> <span class="id">s</span> <span class="id">h</span> =&gt; <span class="id">s</span> "<span class="id">x</span>" = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> 1).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="SemanticsExamples.f3">f3</a></span> : <span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.FlowShallow.html#fexists">fexists</a></span> "<span class="id">z</span>" (<span class="id"><a href="CDF.FlowShallow.html#req">req</a></span> (<span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> "<span class="id">x</span>" "<span class="id">z</span>") ;; <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> (<span class="kwd">fun</span> <span class="id">r</span> =&gt; (<span class="id">r</span>=1) //\\ <span class="id"><a href="CDF.Separation2.html#ptsval">ptsval</a></span> "<span class="id">x</span>" 1)).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Example</span> <span class="id"><a name="SemanticsExamples.ex_sem_f1">ex_sem_f1</a></span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.FlowShallow.html#SemanticsExamples.f1">f1</a></span> <span class="id"><a href="CDF.Common.html#sempty">sempty</a></span> <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span> <span class="id"><a href="CDF.Common.html#sempty">sempty</a></span> <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span> (<span class="id"><a href="CDF.FlowShallow.html#norm">norm</a></span> 1).<br/>
+<div>&nbsp;&nbsp;<span class="toggleproof" onclick="toggleDisplay('proof2')">Proof.</span></div>
+<div class="proofscript" id="proof2">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#SemanticsExamples.f1">f1</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intuition</span> <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intuition</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">heap</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation2.html#pure">pure</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intuition</span> <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Example</span> <span class="id"><a name="SemanticsExamples.ex_sem_f3">ex_sem_f3</a></span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.FlowShallow.html#SemanticsExamples.f3">f3</a></span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> "<span class="id">x</span>" 2 <span class="id"><a href="CDF.Common.html#sempty">sempty</a></span>) (<span class="id"><a href="CDF.Separation2.html#hupdate">hupdate</a></span> 2 3 <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span>) <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> "<span class="id">z</span>" 3 (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> "<span class="id">x</span>" 2 <span class="id"><a href="CDF.Common.html#sempty">sempty</a></span>)) (<span class="id"><a href="CDF.Separation2.html#hupdate">hupdate</a></span> 2 1 <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span>) (<span class="id"><a href="CDF.FlowShallow.html#norm">norm</a></span> 1).<br/>
+<div>&nbsp;&nbsp;<span class="toggleproof" onclick="toggleDisplay('proof3')">Proof.</span></div>
+<div class="proofscript" id="proof3">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#SemanticsExamples.f3">f3</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#fexists">fexists</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intuition</span> <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> 3. <span class="comment">(*&nbsp;the&nbsp;initial&nbsp;value&nbsp;of&nbsp;z&nbsp;in&nbsp;ex&nbsp;z.&nbsp;x-&gt;z,&nbsp;which&nbsp;is&nbsp;given&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#seq">seq</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intuition</span> <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> "<span class="id">z</span>" 3 (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> "<span class="id">x</span>" 2 <span class="id"><a href="CDF.Common.html#sempty">sempty</a></span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> (<span class="id"><a href="CDF.FlowShallow.html#norm">norm</a></span> 5). <span class="comment">(*&nbsp;ret&nbsp;of&nbsp;req,&nbsp;can&nbsp;be&nbsp;anything&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">split</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#req">req</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intuition</span> <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> (<span class="id"><a href="CDF.Separation2.html#hupdate">hupdate</a></span> 2 3 <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">heap</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation2.html#pts">pts</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation2.html#contains">contains</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_other">supdate_other</a></span>; <span class="id">try</span> <span class="id">congruence</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_same">supdate_same</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_same">supdate_same</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intuition</span> <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intuition</span> <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> (<span class="id"><a href="CDF.Separation2.html#hupdate">hupdate</a></span> 2 1 <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">heap</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation2.html#pureconj">pureconj</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intuition</span> <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation2.html#ptsval">ptsval</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation2.html#contains">contains</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_other">supdate_other</a></span>; <span class="id">try</span> <span class="id">congruence</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_same">supdate_same</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eauto</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="CDF.FlowShallow.html#SemanticsExamples">SemanticsExamples</a></span>.<br/>
+<br/>
+<br/>
+<h1> Hoare rules </h1>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="forward">forward</a></span> : <span class="id"><a href="CDF.FlowShallow.html#expr">expr</a></span> -&gt; <span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span> -&gt; <span class="kwd">Prop</span> :=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="fw_const">fw_const</a></span>: <span class="kwd">forall</span> <span class="id">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">forward</span> (<span class="id"><a href="CDF.FlowShallow.html#pconst">pconst</a></span> <span class="id">n</span>) (<span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> (<span class="kwd">fun</span> <span class="id">res</span> =&gt; (<span class="id">res</span> = <span class="id">n</span>) //\\ <span class="id"><a href="CDF.Separation2.html#emp">emp</a></span>))<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="fw_var">fw_var</a></span>: <span class="kwd">forall</span> <span class="id">x</span> <span class="id">v</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">forward</span> (<span class="id"><a href="CDF.FlowShallow.html#pvar">pvar</a></span> <span class="id">x</span>) (<span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> (<span class="kwd">fun</span> <span class="id">res</span> <span class="id">s</span> <span class="id">h</span> =&gt; <span class="id">s</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> /\ <span class="id">res</span> = <span class="id">v</span> /\ <span class="id"><a href="CDF.Separation2.html#emp">emp</a></span> <span class="id">s</span> <span class="id">h</span>))<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="fw_let">fw_let</a></span>: <span class="kwd">forall</span> <span class="id">x</span> <span class="id">e1</span> <span class="id">e2</span> <span class="id">f1</span> <span class="id">f2</span> <span class="id">f3</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">forward</span> <span class="id">e1</span> <span class="id">f1</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">forward</span> <span class="id">e2</span> <span class="id">f2</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.FlowShallow.html#replace_ret">replace_ret</a></span> <span class="id">x</span> <span class="id">f1</span> = <span class="id">f3</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">forward</span> (<span class="id"><a href="CDF.FlowShallow.html#plet">plet</a></span> <span class="id">x</span> <span class="id">e1</span> <span class="id">e2</span>) (<span class="id"><a href="CDF.FlowShallow.html#fexists">fexists</a></span> <span class="id">x</span> (<span class="id">f3</span> ;; <span class="id">f2</span>))<br/>
+<br/>
+.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="ForwardExamples">ForwardExamples</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Example</span> <span class="id"><a name="ex_forward_let1">ex_forward_let1</a></span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> <span class="id">st</span>, <span class="id"><a href="CDF.FlowShallow.html#forward">forward</a></span> (<span class="id"><a href="CDF.FlowShallow.html#plet">plet</a></span> "<span class="id">x</span>" (<span class="id"><a href="CDF.FlowShallow.html#pconst">pconst</a></span> 1) (<span class="id"><a href="CDF.FlowShallow.html#pvar">pvar</a></span> "<span class="id">x</span>")) <span class="id">st</span>.<br/>
+<div>&nbsp;&nbsp;<span class="toggleproof" onclick="toggleDisplay('proof4')">Proof.</span></div>
+<div class="proofscript" id="proof4">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eexists</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eapply</span> <span class="id"><a href="CDF.FlowShallow.html#fw_let">fw_let</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eapply</span> <span class="id"><a href="CDF.FlowShallow.html#fw_const">fw_const</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eapply</span> <span class="id"><a href="CDF.FlowShallow.html#fw_var">fw_var</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Unshelve</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact</span> 3. <span class="comment">(*&nbsp;anything&nbsp;is&nbsp;allowed&nbsp;it&nbsp;seems&nbsp;*)</span><br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="CDF.FlowShallow.html#ForwardExamples">ForwardExamples</a></span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="wellformed">wellformed</a></span> (<span class="id">f</span>:<span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span>) <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span> :=<br/>
+&nbsp;&nbsp;<span class="id">f</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span> -&gt; <span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s1</span> <span class="id">s2</span>.<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="replace_ret_wellformed">replace_ret_wellformed</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">f</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">v</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> = <span class="id">s1</span> <span class="id">x</span> -&gt;<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.FlowShallow.html#wellformed">wellformed</a></span> <span class="id">f</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> (<span class="id"><a href="CDF.FlowShallow.html#norm">norm</a></span> <span class="id">v</span>) -&gt;<br/>
+&nbsp;&nbsp;(<span class="id"><a href="CDF.FlowShallow.html#wellformed">wellformed</a></span> (<span class="id"><a href="CDF.FlowShallow.html#replace_ret">replace_ret</a></span> <span class="id">x</span> <span class="id">f</span>)) <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> (<span class="id"><a href="CDF.FlowShallow.html#norm">norm</a></span> <span class="id">v</span>).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof5')">Proof.</span></div>
+<div class="proofscript" id="proof5">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#wellformed">wellformed</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;unfold&nbsp;satisfies&nbsp;in&nbsp;H1.&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#replace_ret">replace_ret</a></span> <span class="kwd">in</span> <span class="id">H1</span>; <span class="id">destr</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;unfolds.&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="id">congruence</span>.<br/>
+Qed.</div>
+<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="forward_wellformed">forward_wellformed</a></span> : <span class="kwd">forall</span> <span class="id">e</span> <span class="id">f</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span>,<br/>
+<span class="id"><a href="CDF.FlowShallow.html#forward">forward</a></span> <span class="id">e</span> <span class="id">f</span> -&gt; (<span class="id"><a href="CDF.FlowShallow.html#wellformed">wellformed</a></span> <span class="id">f</span>) <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof6')">Proof.</span></div>
+<div class="proofscript" id="proof6">
+<span class="id">intros</span> <span class="id">e</span> <span class="id">f</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span> <span class="id">H</span>.<br/>
+<span class="id">revert</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span>.<br/>
+<span class="id">induction</span> <span class="id">H</span>; <span class="id">intros</span>.<br/>
+- <span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#wellformed">wellformed</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="id">destr</span> <span class="id">H</span>; <span class="id">subst</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Common.html#substore_refl">substore_refl</a></span>.<br/>
+- <span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#wellformed">wellformed</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="id">destr</span> <span class="id">H</span>; <span class="id">subst</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Common.html#substore_refl">substore_refl</a></span>.<br/>
+-<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#wellformed">wellformed</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#fexists">fexists</a></span> <span class="kwd">in</span> <span class="id">H2</span>. <span class="id">destruct</span> <span class="id">H2</span> <span class="kwd">as</span> [? [<span class="id">v</span> <span class="id">H5</span>]]. <span class="id">subst</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#seq">seq</a></span> <span class="kwd">in</span> <span class="id">H5</span>. <span class="id">destruct</span> <span class="id">H5</span> <span class="kwd">as</span> [<span class="id">s3</span> [<span class="id">h3</span> [? [<span class="id">Hrr</span> <span class="id">Hf2</span>]]]]. <span class="id">subst</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;introduce&nbsp;well-formed&nbsp;lemma&nbsp;on&nbsp;replace_ret&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="id">pose</span> <span class="id">proof</span> (<span class="id"><a href="CDF.FlowShallow.html#replace_ret_wellformed">replace_ret_wellformed</a></span> <span class="id">x</span> <span class="id">f1</span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s1</span>) <span class="id">h1</span> <span class="id">s3</span> <span class="id">h3</span> <span class="id">v</span>) <span class="kwd">as</span> <span class="id">Hret</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_same">supdate_same</a></span> <span class="kwd">in</span> <span class="id">Hret</span>.<br/>
+&nbsp;&nbsp;<span class="id">assert</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span>) <span class="kwd">as</span> <span class="id">triv</span>. <span class="id">reflexivity</span>.<br/>
+&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">Hret</span> <span class="id">triv</span>); <span class="id">clear</span> <span class="id">triv</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;assuming&nbsp;f1&nbsp;is&nbsp;wf&nbsp;using&nbsp;the&nbsp;IH,&nbsp;replace_ret&nbsp;f1&nbsp;is&nbsp;wf&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">IHforward1</span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s1</span>) <span class="id">h1</span> <span class="id">s3</span> <span class="id">h3</span> (<span class="id"><a href="CDF.FlowShallow.html#norm">norm</a></span> <span class="id">v</span>)).<br/>
+&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">Hret</span> <span class="id">IHforward1</span>).<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#wellformed">wellformed</a></span> <span class="kwd">in</span> <span class="id">Hret</span>.<br/>
+&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">Hret</span> <span class="id">Hrr</span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#wellformed">wellformed</a></span> <span class="kwd">in</span> <span class="id">IHforward2</span>.<br/>
+&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">IHforward2</span> <span class="id">s3</span> <span class="id">h3</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span> <span class="id">Hf2</span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#wellformed">wellformed</a></span> <span class="kwd">in</span> <span class="id">IHforward1</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#replace_ret">replace_ret</a></span> <span class="kwd">in</span> <span class="id">Hrr</span>; <span class="id">destruct</span> <span class="id">Hrr</span> <span class="kwd">as</span> [? [? <span class="id">Hf1</span>]]; <span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_same">supdate_same</a></span> <span class="kwd">in</span> <span class="id">H1</span>; <span class="id">inj</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">IHforward1</span> <span class="id">Hf1</span>).<br/>
+&nbsp;&nbsp;<span class="id">assert</span> (<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s1</span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s1</span>)).<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Common.html#substore_extension">substore_extension</a></span>; <span class="id">ok</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Common.html#substore_trans">substore_trans</a></span> <span class="kwd">with</span> (<span class="id">s2</span> := <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s1</span>); <span class="id">ok</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Common.html#substore_trans">substore_trans</a></span> <span class="kwd">with</span> (<span class="id">s2</span> := <span class="id">s3</span>); <span class="id">ok</span>.<br/>
+Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="soundness">soundness</a></span> :<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">se1</span> <span class="id">he1</span> <span class="id">e</span> <span class="id">se2</span> <span class="id">he2</span> <span class="id">re</span>  <span class="id">f</span> <span class="id">ss1</span> <span class="id">hs1</span> <span class="id">ss2</span> <span class="id">hs2</span> <span class="id">rs</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.FlowShallow.html#bigstep">bigstep</a></span> <span class="id">se1</span> <span class="id">he1</span> <span class="id">e</span> <span class="id">se2</span> <span class="id">he2</span> <span class="id">re</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">se1</span> <span class="id">ss1</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.FlowShallow.html#forward">forward</a></span> <span class="id">e</span> <span class="id">f</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">f</span> <span class="id">ss1</span> <span class="id">hs1</span> <span class="id">ss2</span> <span class="id">hs2</span> <span class="id">rs</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">se2</span> <span class="id">ss2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\ <span class="id"><a href="CDF.FlowShallow.html#compatible">compatible</a></span> <span class="id">rs</span> <span class="id">re</span>.<br/>
+<div>&nbsp;&nbsp;<span class="toggleproof" onclick="toggleDisplay('proof7')">Proof.</span></div>
+<div class="proofscript" id="proof7">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span> <span class="id">se1</span> <span class="id">he1</span> <span class="id">e</span> <span class="id">se2</span> <span class="id">he2</span> <span class="id">re</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">f</span> <span class="id">ss1</span> <span class="id">hs1</span> <span class="id">ss2</span> <span class="id">hs2</span> <span class="id">rs</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Hb</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">f</span> <span class="id">ss1</span> <span class="id">hs1</span> <span class="id">ss2</span> <span class="id">hs2</span> <span class="id">rs</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">induction</span> <span class="id">Hb</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span> <span class="id">f</span> <span class="id">ss1</span> <span class="id">hs1</span> <span class="id">ss2</span> <span class="id">hs2</span> <span class="id">rs</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span> <span class="id">Hsub</span> <span class="id">Hf</span> <span class="id">Hs</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="comment">(*&nbsp;var.&nbsp;the&nbsp;proof&nbsp;comes&nbsp;down&nbsp;to&nbsp;the&nbsp;fact&nbsp;that&nbsp;both&nbsp;spec&nbsp;and&nbsp;program&nbsp;read<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s(x)&nbsp;and&nbsp;leave&nbsp;the&nbsp;heap&nbsp;unchanged.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">inv</span> <span class="id">Hf</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> <span class="kwd">in</span> <span class="id">Hs</span>; <span class="id">destr</span> <span class="id">Hs</span>. <span class="id">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation2.html#emp">emp</a></span> <span class="kwd">in</span> <span class="id">H9</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#compatible">compatible</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">heap</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="kwd">in</span> <span class="id">Hsub</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">symmetry</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">Hsub</span> <span class="id">v</span> <span class="id">x</span> <span class="id">H</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">congruence</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;-<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">inv</span> <span class="id">Hf</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> <span class="kwd">in</span> <span class="id">Hs</span>; <span class="id">destr</span> <span class="id">Hs</span>; <span class="id">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#compatible">compatible</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation2.html#pureconj">pureconj</a></span> <span class="kwd">in</span> <span class="id">H6</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intuition</span> <span class="id">auto</span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;-<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;we&nbsp;have&nbsp;an&nbsp;IH&nbsp;for&nbsp;each&nbsp;subexpr&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;v&nbsp;is&nbsp;the&nbsp;intermediate&nbsp;result&nbsp;of&nbsp;evaluating&nbsp;e1&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;r&nbsp;is&nbsp;the&nbsp;final&nbsp;result&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;invp&nbsp;Hf&nbsp;[H2&nbsp;H4].&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">inv</span> <span class="id">Hf</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;invp&nbsp;Hf&nbsp;[&nbsp;|&nbsp;|Hff1&nbsp;Hff2].&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;inversion&nbsp;Hf&nbsp;as&nbsp;[&nbsp;Hy&nbsp;Hz&nbsp;|&nbsp;&nbsp;|Hff1&nbsp;Hff2&nbsp;Hz].&nbsp;subst;&nbsp;clear&nbsp;Hf.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;the&nbsp;spec&nbsp;is&nbsp;of&nbsp;the&nbsp;form&nbsp;ex&nbsp;x.&nbsp;f1[x/r];f2&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#fexists">fexists</a></span> <span class="kwd">in</span> <span class="id">Hs</span>. <span class="id">destruct</span> <span class="id">Hs</span> <span class="kwd">as</span> [<span class="id">Hnotin</span> [<span class="id">v1</span> <span class="id">Hseq</span>]].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;see&nbsp;how&nbsp;it&nbsp;evaluates&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#seq">seq</a></span> <span class="kwd">in</span> <span class="id">Hseq</span>. <span class="id">destruct</span> <span class="id">Hseq</span> <span class="kwd">as</span> [<span class="id">s3</span> [<span class="id">h3</span> [? [<span class="id">Hrr</span> ?]]]].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#replace_ret">replace_ret</a></span> <span class="kwd">in</span> <span class="id">Hrr</span>; <span class="id">destruct</span> <span class="id">Hrr</span> <span class="kwd">as</span> [<span class="id">H10</span> [<span class="id">H9</span> <span class="id">H13</span>]].<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;OLD&nbsp;NOW&nbsp;FIXED&nbsp;now&nbsp;the&nbsp;problem&nbsp;is&nbsp;the&nbsp;IH&nbsp;requires&nbsp;the&nbsp;eval&nbsp;of&nbsp;e1&nbsp;to&nbsp;take&nbsp;place&nbsp;in&nbsp;the&nbsp;initial&nbsp;stack.&nbsp;but&nbsp;due&nbsp;to&nbsp;the&nbsp;existential&nbsp;adding&nbsp;something&nbsp;to&nbsp;the&nbsp;stack,&nbsp;the&nbsp;evaluation&nbsp;takes&nbsp;place&nbsp;in&nbsp;an&nbsp;extended&nbsp;stack,&nbsp;so&nbsp;we&nbsp;can't&nbsp;apply&nbsp;the&nbsp;IH&nbsp;for&nbsp;e1&nbsp;*)</span><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;OLD&nbsp;NOW&nbsp;FIXED&nbsp;the&nbsp;problem&nbsp;is&nbsp;the&nbsp;positioning&nbsp;of&nbsp;the&nbsp;existential&nbsp;has&nbsp;changed.&nbsp;in&nbsp;the&nbsp;program,&nbsp;it's&nbsp;in&nbsp;the&nbsp;e2&nbsp;initial&nbsp;stack.&nbsp;in&nbsp;the&nbsp;spec,&nbsp;it's&nbsp;right&nbsp;at&nbsp;the&nbsp;front,&nbsp;in&nbsp;the&nbsp;e1&nbsp;initial&nbsp;stack,&nbsp;for&nbsp;f1&nbsp;to&nbsp;assign&nbsp;its&nbsp;ret&nbsp;value&nbsp;to.&nbsp;so&nbsp;somehow&nbsp;need&nbsp;to&nbsp;generalise&nbsp;it,&nbsp;using&nbsp;compiler&nbsp;simulation&nbsp;techniques?&nbsp;there&nbsp;should&nbsp;be&nbsp;an&nbsp;initial&nbsp;relation&nbsp;too,&nbsp;so&nbsp;the&nbsp;spec&nbsp;is&nbsp;allowed&nbsp;to&nbsp;execute&nbsp;in&nbsp;an&nbsp;extended&nbsp;stack.&nbsp;so&nbsp;there's&nbsp;a&nbsp;sim&nbsp;rel&nbsp;between&nbsp;configurations&nbsp;*)</span><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;try&nbsp;to&nbsp;meet&nbsp;in&nbsp;the&nbsp;middle&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;apply&nbsp;IHHb2.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;with&nbsp;(f:=f2)&nbsp;(ss2:=s2)&nbsp;(ss1:=s2)&nbsp;(hs1:=hs2).&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;easy.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;specialize&nbsp;(IHHb1&nbsp;f1&nbsp;(supdate&nbsp;x&nbsp;v&nbsp;s)&nbsp;hs1&nbsp;s1&nbsp;h1&nbsp;(norm&nbsp;v)&nbsp;).&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">pose</span> <span class="id">proof</span> (<span class="id"><a href="CDF.Common.html#substore_extension_trans">substore_extension_trans</a></span> <span class="id">_</span> <span class="id">s</span> <span class="id">ss1</span> <span class="id">v1</span> <span class="id">x</span> <span class="id">Hsub</span> <span class="id">Hnotin</span>) <span class="kwd">as</span> <span class="id">Hha</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">IHHb1</span> <span class="id">f1</span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v1</span> <span class="id">ss1</span>) <span class="id">hs1</span> <span class="id">s3</span> <span class="id">h3</span> (<span class="id"><a href="CDF.FlowShallow.html#norm">norm</a></span> <span class="id">H10</span>) <span class="id">Hha</span> <span class="id">H2</span> <span class="id">H13</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">destruct</span> <span class="id">IHHb1</span> <span class="kwd">as</span> [<span class="id">IH1</span> <span class="id">IH2</span>].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;we&nbsp;know&nbsp;that&nbsp;evaluation&nbsp;of&nbsp;e1&nbsp;preserves&nbsp;substore&nbsp;*)</span><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;now&nbsp;try&nbsp;to&nbsp;use&nbsp;IH2&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">IHHb2</span> <span class="id">f2</span> <span class="id">s3</span> <span class="id">h3</span> <span class="id">ss2</span> <span class="id">hs2</span> <span class="id">rs</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">IHHb2</span>; <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> (<span class="id"><a href="CDF.Common.html#substore_extension_left">substore_extension_left</a></span> <span class="id">_</span> <span class="id">s1</span> <span class="id">s3</span> <span class="id">v</span> <span class="id">x</span> <span class="id">IH1</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#compatible">compatible</a></span> <span class="kwd">in</span> <span class="id">IH2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> &lt;- <span class="id">IH2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">H9</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_same">supdate_same</a></span> <span class="kwd">in</span> <span class="id">H9</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_same">supdate_same</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;need&nbsp;to&nbsp;know&nbsp;substore&nbsp;(supdate&nbsp;x&nbsp;v1&nbsp;ss1)&nbsp;H6&nbsp;is&nbsp;preserved&nbsp;by&nbsp;all&nbsp;spec/f&nbsp;eval&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;but&nbsp;how&nbsp;to&nbsp;know&nbsp;that,&nbsp;as&nbsp;we&nbsp;can&nbsp;give&nbsp;any&nbsp;f&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">pose</span> <span class="id">proof</span> (<span class="id"><a href="CDF.FlowShallow.html#forward_wellformed">forward_wellformed</a></span> <span class="id">_</span> <span class="id">_</span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v1</span> <span class="id">ss1</span>) <span class="id">hs1</span> <span class="id">s3</span> <span class="id">h3</span> (<span class="id"><a href="CDF.FlowShallow.html#norm">norm</a></span> <span class="id">H10</span>) <span class="id">H2</span>) <span class="kwd">as</span> <span class="id">Hf1wf</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#wellformed">wellformed</a></span> <span class="kwd">in</span> <span class="id">Hf1wf</span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;assert&nbsp;(Hpreserve&nbsp;:&nbsp;substore&nbsp;(supdate&nbsp;x&nbsp;v1&nbsp;ss1)&nbsp;s3).&nbsp;admit.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;apply&nbsp;Hf1wf.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;unfold&nbsp;substore&nbsp;in&nbsp;Hpreserve.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;apply&nbsp;Hpreserve.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">Hf1wf</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">ok</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_same">supdate_same</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">reflexivity</span>.<br/>
+<br/>
+<span class="comment">(*&nbsp;https://xavierleroy.org/courses/EUTypes-2019/slides.pdf&nbsp;*)</span><br/>
+<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<h1> Semantic flows </h1>
+<span class="kwd">Definition</span> <span class="id"><a name="triple">triple</a></span> (<span class="id">pre</span>:<span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span>) (<span class="id">e</span>:<span class="id"><a href="CDF.FlowShallow.html#expr">expr</a></span>) (<span class="id">spec</span>:<span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span>) : <span class="kwd">Prop</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span> <span class="id">sr</span> <span class="id">s0</span> <span class="id">h0</span> <span class="id">r0</span> <span class="id">s3</span> <span class="id">h3</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">pre</span> <span class="id">s0</span> <span class="id">h0</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">r0</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.FlowShallow.html#bigstep">bigstep</a></span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">e</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">spec</span> <span class="id">s0</span> <span class="id">h0</span> <span class="id">s3</span> <span class="id">h3</span> <span class="id">sr</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.FlowShallow.html#compatible">compatible</a></span> <span class="id">sr</span> <span class="id">r</span> /\ <span class="id">h2</span> = <span class="id">h3</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="triple_tabula_rasa">triple_tabula_rasa</a></span> (<span class="id">e</span>:<span class="id"><a href="CDF.FlowShallow.html#expr">expr</a></span>) (<span class="id">spec</span>:<span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span>) : <span class="kwd">Prop</span> :=<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.FlowShallow.html#triple">triple</a></span> <span class="id"><a href="CDF.FlowShallow.html#empty">empty</a></span> <span class="id">e</span> <span class="id">spec</span>.<br/>
+&nbsp;&nbsp;<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="flow_det">flow_det</a></span> : <span class="kwd">forall</span> <span class="id">s</span> <span class="id">h</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">r1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r2</span> (<span class="id">f</span>:<span class="id"><a href="CDF.FlowShallow.html#flow">flow</a></span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">f</span> <span class="id">s</span> <span class="id">h</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">r1</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">f</span> <span class="id">s</span> <span class="id">h</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r2</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">s1</span> = <span class="id">s2</span> /\ <span class="id">h1</span> = <span class="id">h2</span> /\ <span class="id">r1</span> = <span class="id">r2</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof8')">Proof.</span></div>
+<div class="proofscript" id="proof8">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;destruct&nbsp;H.&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="id">admit</span>.<br/>
+Admitted.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="fw_const1">fw_const1</a></span> : <span class="kwd">forall</span> <span class="id">p</span> <span class="id">n</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.FlowShallow.html#triple">triple</a></span> <span class="id">p</span> (<span class="id"><a href="CDF.FlowShallow.html#pconst">pconst</a></span> <span class="id">n</span>) (<span class="id">p</span> ;; <span class="id"><a href="CDF.FlowShallow.html#ens">ens</a></span> (<span class="kwd">fun</span> <span class="id">res</span> =&gt; (<span class="id">res</span> = <span class="id">n</span>) //\\ <span class="id"><a href="CDF.Separation2.html#emp">emp</a></span>)).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof9')">Proof.</span></div>
+<div class="proofscript" id="proof9">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#triple">triple</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">goal</span> <span class="kwd">with</span> | <span class="id">H</span> : <span class="id"><a href="CDF.FlowShallow.html#bigstep">bigstep</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> |- <span class="id">_</span> =&gt; <span class="id">inv</span> <span class="id">H</span> <span class="kwd">end</span>.<br/>
+&nbsp;&nbsp;<span class="id">split</span>.<br/>
+&nbsp;&nbsp;- <span class="id">fstep</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">fstep</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">fstep</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.FlowShallow.html#compatible">compatible</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">ok</span>.<br/>
+&nbsp;&nbsp;- <span class="id">fstep</span>.<br/>
+&nbsp;&nbsp;<span class="id">fstep</span>.<br/>
+&nbsp;&nbsp;<span class="id">fstep</span>.<br/>
+&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id"><a href="CDF.FlowShallow.html#flow_det">flow_det</a></span> <span class="id">s0</span> <span class="id">h0</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r0</span> <span class="id">s3</span> <span class="id">H1</span> <span class="id">H2</span> <span class="id">p</span> <span class="id">H</span> <span class="id">H3</span>).<br/>
+&nbsp;&nbsp;<span class="id">destr</span> <span class="id"><a href="CDF.FlowShallow.html#flow_det">flow_det</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation2.html#emp">emp</a></span> <span class="kwd">in</span> <span class="id">H4</span>.<br/>
+&nbsp;&nbsp;<span class="id">subst</span>.<br/>
+&nbsp;&nbsp;<span class="id">heap</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;TODO&nbsp;substore&nbsp;then&nbsp;needs&nbsp;simulation&nbsp;relation&nbsp;*)</span><br/>
+Abort.</div>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</a></div>
+</body>
+</html>

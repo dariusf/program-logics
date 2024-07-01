@@ -1,0 +1,285 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Trace</title>
+<meta name="description" content="Documentation of Coq module Trace" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Trace</h1>
+<div class="coq">
+<br/>
+<span class="kwd">From</span> <span class="id">Coq</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.ZArith.html">ZArith</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.micromega.Lia.html">Lia</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Bool.Bool.html">Bool</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Lists.List.html">List</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html">String</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Program.Equality.html">Program.Equality</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">Coq</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.FunctionalExtensionality.html">FunctionalExtensionality</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.PropExtensionality.html">PropExtensionality</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">CDF</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="CDF.Separation.html">Separation</a></span>.<br/>
+<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">string_scope</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">nat_scope</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">list_scope</span>.<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="hdisjoint_empty_r">hdisjoint_empty_r</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">h</span>, <span class="id"><a href="CDF.Separation.html#hdisjoint">hdisjoint</a></span> <span class="id">h</span> <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof1')">Proof.</span></div>
+<div class="proofscript" id="proof1">
+&nbsp;&nbsp;<span class="id">cbn</span>. <span class="id">intros</span>. <span class="id">right</span>. <span class="id">cbn</span>. <span class="id">reflexivity</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="hdisjoint_empty">hdisjoint_empty</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">h</span>, <span class="id"><a href="CDF.Separation.html#hdisjoint">hdisjoint</a></span> <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span> <span class="id">h</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof2')">Proof.</span></div>
+<div class="proofscript" id="proof2">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Separation.html#hdisjoint_sym">hdisjoint_sym</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Trace.html#hdisjoint_empty_r">hdisjoint_empty_r</a></span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="hunion_empty_r">hunion_empty_r</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">h</span>, <span class="id"><a href="CDF.Separation.html#hunion">hunion</a></span> <span class="id">h</span> <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span> = <span class="id">h</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof3')">Proof.</span></div>
+<div class="proofscript" id="proof3">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">pose</span> <span class="id">proof</span> (<span class="id"><a href="CDF.Trace.html#hdisjoint_empty_r">hdisjoint_empty_r</a></span> <span class="id">h</span>).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Separation.html#hunion_comm">hunion_comm</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Separation.html#hunion_empty">hunion_empty</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Trace.html#hdisjoint_empty">hdisjoint_empty</a></span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="any">any</a></span> : <span class="id"><a href="CDF.Separation.html#assertion">assertion</a></span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">fun</span> <span class="id">h</span> =&gt; <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="Trace">Trace</a></span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="trace">trace</a></span> : <span class="kwd">Type</span> := <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span> -&gt; <span class="id"><a href="CDF.Separation.html#heap">heap</a></span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="offset">offset</a></span> (<span class="id">n</span> : <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">t</span>: <span class="id"><a href="CDF.Trace.html#trace">trace</a></span>) : <span class="id"><a href="CDF.Trace.html#trace">trace</a></span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">fun</span> <span class="id">m</span> =&gt; <span class="id">t</span> (<span class="id">m</span> + <span class="id">n</span>).<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="flow">flow</a></span> : <span class="kwd">Type</span> := <span class="id"><a href="CDF.Trace.html#trace">trace</a></span> -&gt; <span class="kwd">Prop</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="req">req</a></span> (<span class="id">P</span>: <span class="id"><a href="CDF.Separation.html#assertion">assertion</a></span>) : <span class="id"><a href="CDF.Trace.html#flow">flow</a></span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">fun</span> <span class="id">t</span> =&gt; <span class="kwd">exists</span> <span class="id">h1</span> <span class="id">h2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">t</span> 0 = <span class="id"><a href="CDF.Separation.html#hunion">hunion</a></span> <span class="id">h1</span> <span class="id">h2</span> /\ <span class="id"><a href="CDF.Separation.html#hdisjoint">hdisjoint</a></span> <span class="id">h1</span> <span class="id">h2</span> /\ <span class="id">P</span> <span class="id">h1</span> /\ <span class="id">t</span> 1 = <span class="id">h2</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="ens">ens</a></span> (<span class="id">P</span>: <span class="id"><a href="CDF.Separation.html#assertion">assertion</a></span>) : <span class="id"><a href="CDF.Trace.html#flow">flow</a></span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">fun</span> <span class="id">t</span> =&gt; <span class="kwd">exists</span> <span class="id">h1</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span> <span class="id">h1</span> /\ <span class="id">t</span> 1 = <span class="id"><a href="CDF.Separation.html#hunion">hunion</a></span> (<span class="id">t</span> 0) <span class="id">h1</span> /\ <span class="id"><a href="CDF.Separation.html#hdisjoint">hdisjoint</a></span> (<span class="id">t</span> 0) <span class="id">h1</span>.<br/>
+<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="seq">seq</a></span> (<span class="id">f1</span> <span class="id">f2</span> : <span class="id"><a href="CDF.Trace.html#flow">flow</a></span>) : <span class="id"><a href="CDF.Trace.html#flow">flow</a></span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">fun</span> <span class="id">t</span> =&gt; <span class="id">f1</span> <span class="id">t</span> /\ <span class="id">f2</span> (<span class="id"><a href="CDF.Trace.html#offset">offset</a></span> 1 <span class="id">t</span>).<br/>
+<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="fn">fn</a></span> (<span class="id">name</span> : <span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) : <span class="id"><a href="CDF.Trace.html#flow">flow</a></span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">fun</span> <span class="id">_</span> =&gt; <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="e1_trace">e1_trace</a></span> <span class="id">x</span> := (<span class="kwd">fun</span> <span class="id">t</span> =&gt; <span class="kwd">if</span> <span class="id">t</span> =? 0 <span class="kwd">then</span> (<span class="id"><a href="CDF.Separation.html#hupdate">hupdate</a></span> <span class="id">x</span> 1 <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span>) <span class="kwd">else</span> <span class="kwd">if</span> <span class="id">t</span> =? 1 <span class="kwd">then</span> <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span> <span class="kwd">else</span> (<span class="id"><a href="CDF.Separation.html#hupdate">hupdate</a></span> <span class="id">x</span> 2 <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span>)).<br/>
+<br/>
+<span class="kwd">Example</span> <span class="id"><a name="e1">e1</a></span> : <span class="kwd">forall</span> <span class="id">x</span>, (<span class="id"><a href="CDF.Trace.html#seq">seq</a></span> (<span class="id"><a href="CDF.Trace.html#req">req</a></span> (<span class="id"><a href="CDF.Separation.html#contains">contains</a></span> <span class="id">x</span> 1)) (<span class="id"><a href="CDF.Trace.html#ens">ens</a></span> (<span class="id"><a href="CDF.Separation.html#contains">contains</a></span> <span class="id">x</span> 2))) (<span class="id"><a href="CDF.Trace.html#e1_trace">e1_trace</a></span> <span class="id">x</span>).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof4')">Proof.</span></div>
+<div class="proofscript" id="proof4">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#seq">seq</a></span>; <span class="id">split</span>.<br/>
+&nbsp;&nbsp;- <span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#req">req</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> (<span class="id"><a href="CDF.Separation.html#hupdate">hupdate</a></span> <span class="id">x</span> 1 <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">repeat</span> <span class="id">split</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">cbn</span>. <span class="id">rewrite</span> <span class="id"><a href="CDF.Trace.html#hunion_empty_r">hunion_empty_r</a></span>. <span class="id">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">apply</span> <span class="id"><a href="CDF.Trace.html#hdisjoint_empty_r">hdisjoint_empty_r</a></span>.<br/>
+&nbsp;&nbsp;- <span class="id">cbn</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#ens">ens</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">exists</span> (<span class="id"><a href="CDF.Separation.html#hupdate">hupdate</a></span> <span class="id">x</span> 2 <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">repeat</span> <span class="id">split</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">cbn</span>. <span class="id">rewrite</span> <span class="id"><a href="CDF.Separation.html#hunion_empty">hunion_empty</a></span>. <span class="id">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">cbn</span>. <span class="id">apply</span> <span class="id"><a href="CDF.Trace.html#hdisjoint_empty">hdisjoint_empty</a></span>.<br/>
+Qed.</div>
+<br/>
+<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">Z_scope</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="pt">pt</a></span> (<span class="id">l</span>: <span class="id"><a href="CDF.Separation.html#addr">addr</a></span>) (<span class="id">v</span>: <span class="id"><a href="https://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>) : <span class="id"><a href="CDF.Separation.html#assertion">assertion</a></span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">fun</span> <span class="id">h</span> =&gt; <span class="id">h</span> <span class="id">l</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span>.<br/>
+<br/>
+<span class="kwd">Example</span> <span class="id"><a name="e21">e21</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Separation.html#aimp">aimp</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">h</span> =&gt; <span class="id">h</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> 1 /\ <span class="id">h</span> <span class="id">y</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> 2)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">h</span> =&gt; <span class="id">h</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> 1).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof5')">Proof.</span></div>
+<div class="proofscript" id="proof5">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#aimp">aimp</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#sepconj">sepconj</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;<span class="id">destruct</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;<span class="id">auto</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="sem_frame">sem_frame</a></span> : <span class="kwd">forall</span> <span class="id">h</span> <span class="id">h1</span> <span class="id">h2</span> <span class="id">x</span> <span class="id">v</span>,<br/>
+&nbsp;&nbsp;<span class="id">h</span> = <span class="id"><a href="CDF.Separation.html#hunion">hunion</a></span> <span class="id">h1</span> <span class="id">h2</span> -&gt; <span class="id"><a href="CDF.Separation.html#hdisjoint">hdisjoint</a></span> <span class="id">h1</span> <span class="id">h2</span> -&gt;<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">h1</span> -&gt;<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">x</span> <span class="id">v</span> (<span class="id"><a href="CDF.Separation.html#hunion">hunion</a></span> <span class="id">h1</span> <span class="id">h2</span>).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof6')">Proof.</span></div>
+<div class="proofscript" id="proof6">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#pt">pt</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="kwd">in</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#hunion">hunion</a></span>; <span class="id">simpl</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;<span class="id">auto</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="sem_frame_r">sem_frame_r</a></span> : <span class="kwd">forall</span> <span class="id">h</span> <span class="id">h1</span> <span class="id">h2</span> <span class="id">x</span> <span class="id">v</span>,<br/>
+&nbsp;&nbsp;<span class="id">h</span> = <span class="id"><a href="CDF.Separation.html#hunion">hunion</a></span> <span class="id">h1</span> <span class="id">h2</span> -&gt; <span class="id"><a href="CDF.Separation.html#hdisjoint">hdisjoint</a></span> <span class="id">h1</span> <span class="id">h2</span> -&gt;<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">h2</span> -&gt;<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">x</span> <span class="id">v</span> (<span class="id"><a href="CDF.Separation.html#hunion">hunion</a></span> <span class="id">h1</span> <span class="id">h2</span>).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof7')">Proof.</span></div>
+<div class="proofscript" id="proof7">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#pt">pt</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="kwd">in</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#hunion">hunion</a></span>; <span class="id">simpl</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#hdisjoint">hdisjoint</a></span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H0</span> <span class="id">x</span>).<br/>
+&nbsp;&nbsp;<span class="id">destruct</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;- <span class="id">rewrite</span> <span class="id">H0</span>. <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id">rewrite</span> <span class="id">H0</span> <span class="kwd">in</span> <span class="id">H1</span>. <span class="id">discriminate</span> <span class="id">H1</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Example</span> <span class="id"><a name="e2">e2</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Separation.html#aimp">aimp</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">x</span> 1 ** <span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">y</span> 2)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">x</span> 1).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof8')">Proof.</span></div>
+<div class="proofscript" id="proof8">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#aimp">aimp</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#sepconj">sepconj</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;<span class="id">destruct</span> <span class="id">H</span> <span class="kwd">as</span> [<span class="id">h1</span> [<span class="id">h2</span> [<span class="id">H1</span> [<span class="id">H2</span> [<span class="id">H3</span> <span class="id">H4</span>]]]]].<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="kwd">in</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">H4</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#pt">pt</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> (<span class="id"><a href="CDF.Trace.html#sem_frame">sem_frame</a></span> <span class="id">h</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>); <span class="id">auto</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Example</span> <span class="id"><a name="e22">e22</a></span> : <span class="kwd">forall</span> <span class="id">x</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Separation.html#aimp">aimp</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">x</span> 1)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Separation.html#emp">emp</a></span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof9')">Proof.</span></div>
+<div class="proofscript" id="proof9">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#aimp">aimp</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#emp">emp</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;doesn't&nbsp;work&nbsp;due&nbsp;to&nbsp;needing&nbsp;frame&nbsp;inference&nbsp;*)</span><br/>
+Abort.</div>
+<br/>
+<span class="kwd">Example</span> <span class="id"><a name="e23">e23</a></span> : <span class="kwd">forall</span> <span class="id">x</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Separation.html#aimp">aimp</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">x</span> 1)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Trace.html#any">any</a></span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof10')">Proof.</span></div>
+<div class="proofscript" id="proof10">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#aimp">aimp</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#any">any</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">reflexivity</span>.<br/>
+Qed.</div>
+<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">nat_scope</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="entails">entails</a></span> (<span class="id">f1</span> <span class="id">f2</span> : <span class="id"><a href="CDF.Trace.html#flow">flow</a></span>) : <span class="kwd">Prop</span> := <br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">t</span>, <span class="id">f1</span> <span class="id">t</span> -&gt; <span class="id">f2</span> <span class="id">t</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="entailv">entailv</a></span> (<span class="id">v</span> : <span class="id"><a href="CDF.Trace.html#trace">trace</a></span> -&gt; <span class="kwd">Prop</span>) (<span class="id">f1</span> <span class="id">f2</span> : <span class="id"><a href="CDF.Trace.html#flow">flow</a></span>) : <span class="kwd">Prop</span> := <br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">t</span>, <span class="id">v</span> <span class="id">t</span> -&gt; <span class="id">f1</span> <span class="id">t</span> -&gt; <span class="id">f2</span> <span class="id">t</span>.<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="pt_hupdate_same">pt_hupdate_same</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">v</span> <span class="id">h</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">h</span> -&gt;<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Separation.html#hupdate">hupdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">h</span> = <span class="id">h</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof11')">Proof.</span></div>
+<div class="proofscript" id="proof11">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Separation.html#heap_extensionality">heap_extensionality</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">simpl</span>.<br/>
+&nbsp;&nbsp;<span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.BinInt.html#Z.eq_dec">Z.eq_dec</a></span> <span class="id">x</span> <span class="id">l</span>).<br/>
+&nbsp;&nbsp;- <span class="id">rewrite</span> &lt;- <span class="id">H</span>. <span class="id">rewrite</span> <span class="id">e</span>. <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id">reflexivity</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="hdisjoint_hupdate_hfree">hdisjoint_hupdate_hfree</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">v</span> <span class="id">h</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Separation.html#hdisjoint">hdisjoint</a></span> (<span class="id"><a href="CDF.Separation.html#hupdate">hupdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span>) (<span class="id"><a href="CDF.Separation.html#hfree">hfree</a></span> <span class="id">x</span> <span class="id">h</span>).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof12')">Proof.</span></div>
+<div class="proofscript" id="proof12">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#hdisjoint">hdisjoint</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.BinInt.html#Z.eq_dec">Z.eq_dec</a></span> <span class="id">x</span> <span class="id">l</span>).<br/>
+&nbsp;&nbsp;- <span class="id">right</span>. <span class="id">rewrite</span> <span class="id">e</span>. <span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#hfree">hfree</a></span>. <span class="id">simpl</span>. <span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.BinInt.html#Z.eq_dec">Z.eq_dec</a></span> <span class="id">l</span> <span class="id">l</span>). <span class="id">reflexivity</span>. <span class="id">exfalso</span>. <span class="id">unfold</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#not">not</a></span> <span class="kwd">in</span> <span class="id">n</span>. <span class="id">apply</span> <span class="id">n</span>. <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id">left</span>. <span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#hupdate">hupdate</a></span>. <span class="id">simpl</span>. <span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.BinInt.html#Z.eq_dec">Z.eq_dec</a></span> <span class="id">x</span> <span class="id">l</span>). <span class="id">exfalso</span>. <span class="id">apply</span> <span class="id">n</span>. <span class="id">auto</span>. <span class="id">auto</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="hunion_hupdate_hfree">hunion_hupdate_hfree</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">v</span> <span class="id">h</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Separation.html#hunion">hunion</a></span> (<span class="id"><a href="CDF.Separation.html#hupdate">hupdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span>) (<span class="id"><a href="CDF.Separation.html#hfree">hfree</a></span> <span class="id">x</span> <span class="id">h</span>) = <span class="id"><a href="CDF.Separation.html#hupdate">hupdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">h</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof13')">Proof.</span></div>
+<div class="proofscript" id="proof13">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Separation.html#heap_extensionality">heap_extensionality</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#hunion">hunion</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">simpl</span>.<br/>
+&nbsp;&nbsp;<span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.BinInt.html#Z.eq_dec">Z.eq_dec</a></span> <span class="id">x</span> <span class="id">l</span>).<br/>
+&nbsp;&nbsp;- <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id">reflexivity</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="pt_hunion_hupdate_free">pt_hunion_hupdate_free</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">v</span> <span class="id">h</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">h</span> -&gt;<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Separation.html#hunion">hunion</a></span> (<span class="id"><a href="CDF.Separation.html#hupdate">hupdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span>) (<span class="id"><a href="CDF.Separation.html#hfree">hfree</a></span> <span class="id">x</span> <span class="id">h</span>) = <span class="id">h</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof14')">Proof.</span></div>
+<div class="proofscript" id="proof14">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">pose</span> <span class="id">proof</span> (<span class="id"><a href="CDF.Trace.html#pt_hupdate_same">pt_hupdate_same</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">H</span>).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> &lt;- <span class="id">H0</span> <span class="kwd">at</span> 2.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Trace.html#hunion_hupdate_hfree">hunion_hupdate_hfree</a></span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Example</span> <span class="id"><a name="e3">e3</a></span> : <span class="kwd">forall</span> <span class="id">x</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Trace.html#entailv">entailv</a></span> (<span class="kwd">fun</span> <span class="id">t</span> =&gt; <span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">x</span> 1 (<span class="id">t</span> 0))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="CDF.Trace.html#req">req</a></span> <span class="id"><a href="CDF.Separation.html#emp">emp</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="CDF.Trace.html#req">req</a></span> (<span class="id"><a href="CDF.Trace.html#pt">pt</a></span> <span class="id">x</span> 1)).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof15')">Proof.</span></div>
+<div class="proofscript" id="proof15">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#entailv">entailv</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#req">req</a></span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;<span class="id">destruct</span> <span class="id">H0</span> <span class="kwd">as</span> [<span class="id">h1</span> [<span class="id">h2</span> [<span class="id">H1</span> [<span class="id">H2</span> [<span class="id">H3</span>]]]]].<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Separation.html#emp">emp</a></span> <span class="kwd">in</span> <span class="id">H3</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;h1&nbsp;is&nbsp;empty,&nbsp;h2&nbsp;=&nbsp;t&nbsp;0&nbsp;=&nbsp;t&nbsp;1&nbsp;*)</span><br/>
+<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#req">req</a></span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;h0&nbsp;is&nbsp;x-&gt;1,&nbsp;h3&nbsp;is&nbsp;h2-h0&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="kwd">exists</span> (<span class="id"><a href="CDF.Separation.html#hupdate">hupdate</a></span> <span class="id">x</span> 1 <span class="id"><a href="CDF.Separation.html#hempty">hempty</a></span>).<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;pose&nbsp;proof&nbsp;(exists&nbsp;h3,&nbsp;h2&nbsp;=&nbsp;hunion&nbsp;h4&nbsp;h3).&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="kwd">exists</span> (<span class="id"><a href="CDF.Separation.html#hfree">hfree</a></span> <span class="id">x</span> <span class="id">h2</span>).<br/>
+&nbsp;&nbsp;<span class="id">repeat</span> <span class="id">split</span>.<br/>
+&nbsp;&nbsp;- <span class="id">rewrite</span> <span class="id">H3</span> <span class="kwd">in</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Separation.html#hunion_empty">hunion_empty</a></span> <span class="kwd">in</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> &lt;- <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">pose</span> <span class="id">proof</span> (<span class="id"><a href="CDF.Trace.html#pt_hunion_hupdate_free">pt_hunion_hupdate_free</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">H</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">H4</span>. <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id">apply</span> <span class="id"><a href="CDF.Trace.html#hdisjoint_hupdate_hfree">hdisjoint_hupdate_hfree</a></span>.<br/>
+&nbsp;&nbsp;- <span class="id">unfold</span> <span class="id"><a href="CDF.Trace.html#pt">pt</a></span>. <span class="id">simpl</span>. <span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.BinInt.html#Z.eq_dec">Z.eq_dec</a></span> <span class="id">x</span> <span class="id">x</span>); <span class="id">auto</span>. <span class="id">exfalso</span>. <span class="id">apply</span> <span class="id">n</span>. <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id">admit</span>. <span class="comment">(*&nbsp;gg,&nbsp;implication&nbsp;does&nbsp;not&nbsp;mean&nbsp;subheap&nbsp;*)</span><br/>
+Abort.</div>
+<br/>
+<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="CDF.Trace.html#Trace">Trace</a></span>.<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</a></div>
+</body>
+</html>
