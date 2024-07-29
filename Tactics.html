@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html class="alectryon-standalone"><head><title>Tactics.v</title><meta charset="utf-8"><meta content="Alectryon" name="generator"><meta name="viewport" content="width=device-width, initial-scale=1"><link href="alectryon.css" rel="stylesheet"><link href="pygments.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/IBM-type/0.5.4/css/ibm-type.min.css" integrity="sha512-sky5cf9Ts6FY1kstGOBHSybfKqdHR41M0Ldb0BjNiv3ifltoQIsg0zIaQ+wwdwgQ0w9vKFW7Js50lxH9vqNSSw==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/firacode/5.2.0/fira_code.min.css" integrity="sha512-MbysAYimH1hH2xYzkkMHB6MqxBqfP0megxsCLknbYqHVwXTCg9IqHbk+ZP/vnhO8UEW6PaXAkKe2vQ+SWACxxA==" crossorigin="anonymous" /><script src="alectryon.js"></script></head><body><article class="alectryon-root alectryon-centered alectryon-coqdoc"><div class="alectryon-banner">Built with <a href="https://github.com/cpitclaudel/alectryon/">Alectryon</a>, running Coq+SerAPI v8.19.0+0.19.3. Bubbles (<span class="alectryon-bubble"></span>) indicate interactive fragments: hover for details, tap to reveal contents. Use <kbd>Ctrl+↑</kbd> <kbd>Ctrl+↓</kbd> to navigate, <kbd>Ctrl+🖱️</kbd> to focus. On Mac, use <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>.</div><pre class="alectryon-io highlight"><!-- Generator: Alectryon --><span class="alectryon-wsp"><span class="c">(* some old tactics *)</span>
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Tactic Notation</span> <span class="s2">&quot;inj&quot;</span> <span class="kp">constr</span>(h) := <span class="nb">injection</span> h <span class="kr">as</span> h; <span class="nb">subst</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Tactic Notation</span> <span class="s2">&quot;ok&quot;</span> := <span class="nb">intuition</span> <span class="nb">auto</span>; <span class="kp">try</span> <span class="bp">easy</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+<span class="c">(* these could be made less powerful in future, so they can&#39;t be used wrongly *)</span>
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Tactic Notation</span> <span class="s2">&quot;vacuous&quot;</span> := <span class="bp">easy</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp"><span class="c">(* Tactic Notation &quot;ih&quot; := ok. *)</span>
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Tactic Notation</span> <span class="s2">&quot;case_on&quot;</span> <span class="kp">constr</span>(e) := <span class="kr">let</span> <span class="nv">H</span> := <span class="kp">fresh</span> <span class="kr">in</span> <span class="nb">destruct</span> e <span class="nb">eqn</span>:H; ok.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Tactic Notation</span> <span class="s2">&quot;case_on&quot;</span> <span class="kp">constr</span>(e) <span class="kn">ident</span>(x) := <span class="nb">destruct</span> e <span class="nb">eqn</span>:x; ok.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp"><span class="c">(* Tactic Notation &quot;gen&quot; ident_list(x) := generalize dependent x. *)</span>
+
+<span class="c">(* new ones *)</span>
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Ltac</span> <span class="nf">inv</span> H := <span class="nb">inversion</span> H; <span class="nb">clear</span> H; <span class="nb">subst</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp"><span class="c">(* Tactic Notation &quot;inv&quot; constr(h) := inversion h; subst. *)</span>
+<span class="c">(* Ltac invp H P := inversion H as P; clear H; subst. *)</span>
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Tactic Notation</span> <span class="s2">&quot;invp&quot;</span> <span class="kp">constr</span>(h) simple_intropattern(p) := <span class="nb">inversion</span> h <span class="kr">as</span> p; <span class="nb">subst</span>; <span class="nb">clear</span> h.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+<span class="c">(* Ltac rw := rewrite. *)</span>
+<span class="c">(* Ltac con := constructor. *)</span>
+
+<span class="c">(* https://github.com/tchajed/coq-tricks/blob/master/src/Deex.v *)</span>
+<span class="c">(* Ltac deex :=</span>
+<span class="c">  repeat match goal with</span>
+<span class="c">         | [ H: exists (name:_), _ |- _ ] =&gt;</span>
+<span class="c">           let name&#39; := fresh name in</span>
+<span class="c">           destruct H as [name&#39; H]</span>
+<span class="c">         end. *)</span>
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Ltac</span> <span class="nf">destr</span> H :=
+  <span class="kr">match</span> <span class="kp">type of</span> H <span class="kr">with</span>
+  | ex _ =&gt;
+    <span class="kr">let</span> <span class="nv">L</span> := <span class="kp">fresh</span> <span class="kr">in</span>
+    <span class="kr">let</span> <span class="nv">R</span> := <span class="kp">fresh</span> <span class="kr">in</span>
+    <span class="nb">destruct</span> H <span class="kr">as</span> [L R]; destr R
+  <span class="c">(* | [ H: exists (name:_), _ |- _ ] =&gt;</span>
+<span class="c">    let name&#39; := fresh name in</span>
+<span class="c">    destruct H as [name&#39; H] *)</span>
+  | _ /\ _ =&gt;
+    <span class="kr">let</span> <span class="nv">L</span> := <span class="kp">fresh</span> <span class="kr">in</span>
+    <span class="kr">let</span> <span class="nv">R</span> := <span class="kp">fresh</span> <span class="kr">in</span>
+    <span class="nb">destruct</span> H <span class="kr">as</span> [L R]; destr L; destr R
+  | _ =&gt; <span class="kp">idtac</span>
+  <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Ltac</span> <span class="nf">destr_all</span> :=
+  <span class="kr">match goal with</span>
+  | H : _ /\ _ |- _ =&gt; destr H; destr_all
+  | H : ex _ |- _ =&gt; destr H; destr_all
+  | _ =&gt; <span class="kp">idtac</span>
+  <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+<span class="c">(* https://github.com/mattam82/Coq-Equations/blob/main/theories/Init.v#L148 *)</span>
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Ltac</span> <span class="nf">forward_gen</span> H tac :=
+  <span class="kr">match</span> <span class="kp">type of</span> H <span class="kr">with</span>
+  | <span class="kr">forall</span> (<span class="nv">_</span> : <span class="nl">?X</span>), _ =&gt; <span class="kr">let</span> <span class="nv">H&#39;</span> := <span class="kp">fresh</span> <span class="kr">in</span> <span class="nb">assert</span> (H&#39;:X) ; [tac|<span class="nb">specialize</span> (H H&#39;); <span class="nb">clear</span> H&#39;]
+  <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Tactic Notation</span> <span class="s2">&quot;forward&quot;</span> <span class="kp">constr</span>(H) := forward_gen H <span class="kp">ltac</span>:(<span class="kp">idtac</span>).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Tactic Notation</span> <span class="s2">&quot;forward&quot;</span> <span class="kp">constr</span>(H) <span class="s2">&quot;by&quot;</span> tactic(tac) := forward_gen H tac.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+<span class="c">(* https://softwarefoundations.cis.upenn.edu/plf-current/LibTactics.html *)</span>
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Ltac</span> <span class="nf">get_head</span> E :=
+  <span class="kr">match</span> E <span class="kr">with</span>
+  | <span class="nl">?E&#39;</span> <span class="nl">?x</span> =&gt; get_head E&#39;
+  | _ =&gt; <span class="kp">constr</span>:(E)
+  <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Ltac</span> <span class="nf">apply_to_head_of</span> E cont :=
+  <span class="kr">let</span> <span class="nv">go</span> <span class="nv">E</span> :=
+    <span class="kr">let</span> <span class="nv">P</span> := get_head E <span class="kr">in</span> cont P <span class="kr">in</span>
+  <span class="kr">match</span> E <span class="kr">with</span>
+  | <span class="kr">forall</span> <span class="nv">_</span>,_ =&gt; <span class="nb">intros</span>; apply_to_head_of E cont
+  | <span class="nl">?A</span> = <span class="nl">?B</span> =&gt; <span class="kp">first</span> [ go A | go B ]
+  | <span class="nl">?A</span> =&gt; go A
+  <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Ltac</span> <span class="nf">unfolds_base</span> :=
+  <span class="kr">match goal with</span> |- <span class="nl">?G</span> =&gt;
+   apply_to_head_of G <span class="kp">ltac</span>:(<span class="kr">fun</span> <span class="nv">P</span> =&gt; <span class="nb">unfold</span> P) <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+<span class="c">(* Tactic Notation &quot;unfolds&quot; :=</span>
+<span class="c">  unfolds_base. *)</span>
+
+<span class="c">(* TODO unfolds does not terminate when given an implication? *)</span>
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Ltac</span> <span class="nf">unfolds_in_base</span> H :=
+  <span class="kr">match</span> <span class="kp">type of</span> H <span class="kr">with</span> <span class="nl">?G</span> =&gt;
+   apply_to_head_of G <span class="kp">ltac</span>:(<span class="kr">fun</span> <span class="nv">P</span> =&gt; <span class="nb">unfold</span> P <span class="kr">in</span> H) <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp"><span class="c">(* Tactic Notation &quot;unfolds&quot; &quot;in&quot; hyp(H) :=</span>
+<span class="c">  unfolds_in_base H. *)</span></span></pre></article></body></html>

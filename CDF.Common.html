@@ -1,0 +1,511 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Common</title>
+<meta name="description" content="Documentation of Coq module Common" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<h1 class="title">Module Common</h1>
+<div class="coq">
+<br/>
+<span class="kwd">From</span> <span class="id">CDF</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="CDF.Tactics.html">Tactics</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">Coq</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.FunctionalExtensionality.html">FunctionalExtensionality</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.PropExtensionality.html">PropExtensionality</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">Coq</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.ZArith.html">ZArith</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.micromega.Lia.html">Lia</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Bool.Bool.html">Bool</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Lists.List.html">List</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html">String</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Program.Equality.html">Program.Equality</a></span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">Z_scope</span>.<br/>
+<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">string_scope</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="ident">ident</a></span> := <span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="Store">Store</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="store">store</a></span> (<span class="id">A</span>:<span class="kwd">Type</span>) : <span class="kwd">Type</span> := <span class="id"><a href="CDF.Common.html#ident">ident</a></span> -&gt; <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id">A</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="sempty">sempty</a></span> {<span class="id">A</span>:<span class="kwd">Type</span>} : <span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span> := (<span class="kwd">fun</span> _ =&gt; <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>).<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="supdate">supdate</a></span> {<span class="id">A</span>:<span class="kwd">Type</span>} (<span class="id">x</span>: <span class="id"><a href="CDF.Common.html#ident">ident</a></span>) (<span class="id">v</span>: <span class="id">A</span>) (<span class="id">s</span>: <span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>) : <span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">fun</span> <span class="id">y</span> =&gt; <span class="kwd">if</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">x</span> <span class="id">y</span> <span class="kwd">then</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> <span class="kwd">else</span> <span class="id">s</span> <span class="id">y</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="sremove">sremove</a></span> {<span class="id">A</span>:<span class="kwd">Type</span>} (<span class="id">x</span>: <span class="id"><a href="CDF.Common.html#ident">ident</a></span>) (<span class="id">s</span>: <span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>) : <span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">fun</span> <span class="id">y</span> =&gt; <span class="kwd">if</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">x</span> <span class="id">y</span> <span class="kwd">then</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> <span class="kwd">else</span> <span class="id">s</span> <span class="id">y</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="sremove_any">sremove_any</a></span>: <span class="kwd">forall</span> <span class="id">l</span> <span class="id">A</span> (<span class="id">s</span> : <span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="CDF.Common.html#sremove">sremove</a></span> <span class="id">l</span> <span class="id">s</span>) <span class="id">l</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>; <span class="id">cbn</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#sremove">sremove</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">l</span> <span class="id">l</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">easy</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="supdate_same">supdate_same</a></span>: <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">h</span>:<span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>) <span class="id">v</span> <span class="id">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">l</span> <span class="id">v</span> <span class="id">h</span>) <span class="id">l</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>; <span class="id">cbn</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">l</span> <span class="id">l</span>); <span class="id">congruence</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="supdate_noop">supdate_noop</a></span> : <span class="kwd">forall</span> <span class="id">A</span> <span class="id">s</span> <span class="id">x</span> (<span class="id">v</span>:<span class="id">A</span>), <span class="id">s</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> -&gt; <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s</span> = <span class="id">s</span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.FunctionalExtensionality.html#functional_extensionality">functional_extensionality</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">x</span> <span class="id">x0</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">congruence</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">reflexivity</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="supdate_other">supdate_other</a></span>: <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">h</span>:<span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>) <span class="id">l</span> <span class="id">v</span> <span class="id">l'</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">l</span> &lt;&gt; <span class="id">l'</span> -&gt; (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">l</span> <span class="id">v</span> <span class="id">h</span>) <span class="id">l'</span> = <span class="id">h</span> <span class="id">l'</span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>; <span class="id">cbn</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">l</span> <span class="id">l'</span>); <span class="id">congruence</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="supdate_dupe">supdate_dupe</a></span> : <span class="kwd">forall</span> {<span class="id">A</span>} (<span class="id">v</span>:<span class="id">A</span>) <span class="id">x</span> <span class="id">s</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s</span>) = <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s</span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.FunctionalExtensionality.html#functional_extensionality">functional_extensionality</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">x</span> <span class="id">x0</span>); <span class="id">easy</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="substore">substore</a></span> {<span class="id">A</span>:<span class="kwd">Type</span>} (<span class="id">s1</span> <span class="id">s2</span> : <span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">v</span> <span class="id">x</span>, <span class="id">s1</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> -&gt; <span class="id">s2</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substore_notin">substore_notin</a></span> : <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">s</span>:<span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>) <span class="id">v</span> <span class="id">x</span> <span class="id">y</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">s</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt; <span class="id">s</span> <span class="id">y</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> -&gt; <span class="id">x</span> &lt;&gt; <span class="id">y</span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#not">not</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">congruence</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substore_extension">substore_extension</a></span> : <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">s2</span>:<span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>) <span class="id">v</span> <span class="id">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">s2</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt; <span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s2</span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s2</span>).<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> &lt;- <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Common.html#supdate_other">supdate_other</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Common.html#substore_notin">substore_notin</a></span> <span class="kwd">with</span> (<span class="id">s</span>:=<span class="id">s2</span>) (<span class="id">v</span>:=<span class="id">v0</span>); <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substore_refl">substore_refl</a></span> : <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">s1</span>:<span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s1</span> <span class="id">s1</span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">now</span> <span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substore_trans">substore_trans</a></span> : <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">s1</span> <span class="id">s2</span> <span class="id">s3</span>: <span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s1</span> <span class="id">s2</span> -&gt; <span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s2</span> <span class="id">s3</span> -&gt; <span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s1</span> <span class="id">s3</span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">now</span> <span class="id">apply</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substore_extension_trans">substore_extension_trans</a></span> : <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">s1</span> <span class="id">s2</span>: <span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>) <span class="id">v</span> <span class="id">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s1</span> <span class="id">s2</span> -&gt; <span class="id">s2</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt; <span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s1</span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s2</span>).<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">assert</span> (<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s2</span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s2</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">now</span> <span class="id">apply</span> <span class="id"><a href="CDF.Common.html#substore_extension">substore_extension</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">now</span> <span class="id">apply</span> <span class="id"><a href="CDF.Common.html#substore_trans">substore_trans</a></span> <span class="kwd">with</span> (<span class="id">s2</span> := <span class="id">s2</span>).<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substore_extension_inv">substore_extension_inv</a></span> : <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">s1</span> <span class="id">s2</span>:<span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>) <span class="id">v</span> <span class="id">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s1</span>) <span class="id">s2</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">s2</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_same">supdate_same</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">auto</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substore_mem">substore_mem</a></span> : <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">s1</span> <span class="id">s2</span>:<span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>) <span class="id">v</span> <span class="id">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s1</span> <span class="id">s2</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">s1</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">s2</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">easy</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+<div class="doc">This can't be proved, as substore only concerns bindings which are present </div>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substore_mem_contra">substore_mem_contra</a></span> : <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">s1</span> <span class="id">s2</span>:<span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>) <span class="id">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s1</span> <span class="id">s2</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">s2</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">s1</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;Abort.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substore_extension_left">substore_extension_left</a></span> : <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">s1</span> <span class="id">s2</span>:<span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">A</span>) <span class="id">v</span> <span class="id">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s1</span> <span class="id">s2</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">s2</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s1</span>) <span class="id">s2</span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="kwd">in</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">x</span> <span class="id">x0</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">H1</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">e</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">assumption</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">assumption</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substore_empty">substore_empty</a></span> : <span class="kwd">forall</span> (<span class="id">A</span>:<span class="kwd">Type</span>) <span class="id">s</span>, @<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">A</span> <span class="id"><a href="CDF.Common.html#sempty">sempty</a></span> <span class="id">s</span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#sempty">sempty</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">ok</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+<div class="doc">The converse is not true. Consider: (x=1)<span class="bracket"><span class="id">x</span>:=2</span> &lt;= (y=1)<span class="bracket"><span class="id">x</span>:=2</span> </div>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substore_aug">substore_aug</a></span> : <span class="kwd">forall</span> <span class="id">A</span> <span class="id">x</span> (<span class="id">v</span>:<span class="id">A</span>) <span class="id">s1</span> <span class="id">s2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s1</span> <span class="id">s2</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s1</span>) (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s2</span>).<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">x</span> <span class="id">x0</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">x0</span> <span class="id">x0</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">inj</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">ok</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">ok</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_other">supdate_other</a></span>; <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">pose</span> <span class="id">proof</span> (<span class="id"><a href="CDF.Common.html#supdate_other">supdate_other</a></span> <span class="id">A</span> <span class="id">s1</span> <span class="id">x</span> <span class="id">v</span> <span class="id">x0</span> <span class="id">n</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">H1</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">auto</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+<div class="doc">A restricted version of the converse is true, however. </div>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substore_reduce_left">substore_reduce_left</a></span> : <span class="kwd">forall</span> <span class="id">A</span> <span class="id">x</span> (<span class="id">v</span>:<span class="id">A</span>) <span class="id">s1</span> <span class="id">s2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">s1</span> <span class="id">x</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s1</span>) <span class="id">s2</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="id">s1</span> <span class="id">s2</span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span>. <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#substore">substore</a></span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">destruct</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">x</span> <span class="id">x0</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">congruence</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#supdate_other">supdate_other</a></span>; <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;Qed.</div></details>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="CDF.Common.html#Store">Store</a></span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="Well_founded_Nat">Well_founded_Nat</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">nat_scope</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Variable</span> <span class="id"><a name="Well_founded_Nat.A">A</a></span> : <span class="kwd">Type</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Variable</span> <span class="id"><a name="Well_founded_Nat.f">f</a></span> : <span class="id"><a href="CDF.Common.html#Well_founded_Nat.A">A</a></span> -&gt; <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="ltof">ltof</a></span> (<span class="id">a</span> <span class="id">b</span>:<span class="id"><a href="CDF.Common.html#Well_founded_Nat.A">A</a></span>) := <span class="id"><a href="CDF.Common.html#Well_founded_Nat.f">f</a></span> <span class="id">a</span> &lt; <span class="id"><a href="CDF.Common.html#Well_founded_Nat.f">f</a></span> <span class="id">b</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="gtof">gtof</a></span> (<span class="id">a</span> <span class="id">b</span>:<span class="id"><a href="CDF.Common.html#Well_founded_Nat.A">A</a></span>) := <span class="id"><a href="CDF.Common.html#Well_founded_Nat.f">f</a></span> <span class="id">b</span> &gt; <span class="id"><a href="CDF.Common.html#Well_founded_Nat.f">f</a></span> <span class="id">a</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="well_founded_ltof">well_founded_ltof</a></span> : <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Wf.html#well_founded">well_founded</a></span> <span class="id"><a href="CDF.Common.html#ltof">ltof</a></span>.<br/>
+<details>
+&nbsp;&nbsp;<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Wf.html#well_founded">well_founded</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">assert</span> (<span class="id">H</span> : <span class="kwd">forall</span> <span class="id">n</span> (<span class="id">a</span>:<span class="id"><a href="CDF.Common.html#Well_founded_Nat.A">A</a></span>), <span class="id"><a href="CDF.Common.html#Well_founded_Nat.f">f</a></span> <span class="id">a</span> &lt; <span class="id">n</span> -&gt; <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Wf.html#Acc">Acc</a></span> <span class="id"><a href="CDF.Common.html#ltof">ltof</a></span> <span class="id">a</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="id">intro</span> <span class="id">n</span>; <span class="id">induction</span> <span class="id">n</span> <span class="kwd">as</span> [|<span class="id">n</span> <span class="id">IHn</span>].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">intros</span> <span class="id">a</span> <span class="id">Ha</span>; <span class="id">absurd</span> (<span class="id"><a href="CDF.Common.html#Well_founded_Nat.f">f</a></span> <span class="id">a</span> &lt; 0); <span class="id">auto</span>. <span class="id">apply</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.nlt_0_r">Nat.nlt_0_r</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">intros</span> <span class="id">a</span> <span class="id">Ha</span>. <span class="id">apply</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Wf.html#Acc_intro">Acc_intro</a></span>. <span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#ltof">ltof</a></span> <span class="kwd">at</span> 1. <span class="id">intros</span> <span class="id">b</span> <span class="id">Hb</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">IHn</span>. <span class="id">apply</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.lt_le_trans">Nat.lt_le_trans</a></span> <span class="kwd">with</span> (<span class="id"><a href="CDF.Common.html#Well_founded_Nat.f">f</a></span> <span class="id">a</span>); <span class="id">auto</span>. <span class="id">now</span> <span class="id">apply</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.succ_le_mono">Nat.succ_le_mono</a></span>. }<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intros</span> <span class="id">a</span>. <span class="id">apply</span> (<span class="id">H</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="CDF.Common.html#Well_founded_Nat.f">f</a></span> <span class="id">a</span>))). <span class="id">apply</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.lt_succ_diag_r">Nat.lt_succ_diag_r</a></span>.<br/>
+&nbsp;&nbsp;Defined.</div></details>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="CDF.Common.html#Well_founded_Nat">Well_founded_Nat</a></span>.<br/>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="nati">nati</a></span> := <span class="id"><a name="n">n</a></span> (<span class="id">n</span>:<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) | <span class="id"><a name="inf">inf</a></span>.<br/>
+<br/>
+<span class="kwd">Coercion</span> <span class="id">n</span> : <span class="id">nat</span> &gt;-&gt; <span class="id">nati</span>.<br/>
+<span class="id">Declare</span> <span class="kwd">Scope</span> <span class="id">nati_scope</span>.<br/>
+<span class="id">Delimit</span> <span class="kwd">Scope</span> <span class="id">nati_scope</span> <span class="kwd">with</span> <span class="id">nati</span>.<br/>
+<span class="kwd">Notation</span> <span class="string">"∞"</span> := <span class="id"><a href="CDF.Common.html#inf">inf</a></span> : <span class="id">nati_scope</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="nati_le">nati_le</a></span> (<span class="id">a</span> <span class="id">b</span>:<span class="id"><a href="CDF.Common.html#nati">nati</a></span>) : <span class="kwd">Prop</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">a</span>, <span class="id">b</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="CDF.Common.html#n">n</a></span> <span class="id">a</span>, <span class="id"><a href="CDF.Common.html#n">n</a></span> <span class="id">b</span> =&gt; (<span class="id">a</span>&lt;=<span class="id">b</span>)%<span class="id">nat</span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="CDF.Common.html#n">n</a></span> _, <span class="id"><a href="CDF.Common.html#inf">inf</a></span> =&gt; <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="CDF.Common.html#inf">inf</a></span>, <span class="id"><a href="CDF.Common.html#n">n</a></span> _ =&gt; <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#False">False</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="CDF.Common.html#inf">inf</a></span>, <span class="id"><a href="CDF.Common.html#inf">inf</a></span> =&gt; <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span><br/>
+&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="nati_plus">nati_plus</a></span> (<span class="id">a</span> <span class="id">b</span>:<span class="id"><a href="CDF.Common.html#nati">nati</a></span>) : <span class="id"><a href="CDF.Common.html#nati">nati</a></span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">a</span>, <span class="id">b</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="CDF.Common.html#n">n</a></span> <span class="id">a</span>, <span class="id"><a href="CDF.Common.html#n">n</a></span> <span class="id">b</span> =&gt; <span class="id"><a href="CDF.Common.html#n">n</a></span> (<span class="id">a</span>+<span class="id">b</span>)%<span class="id">nat</span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="CDF.Common.html#n">n</a></span> _, <span class="id"><a href="CDF.Common.html#inf">inf</a></span> =&gt; <span class="id"><a href="CDF.Common.html#inf">inf</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="CDF.Common.html#inf">inf</a></span>, <span class="id"><a href="CDF.Common.html#n">n</a></span> _ =&gt; <span class="id"><a href="CDF.Common.html#inf">inf</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="CDF.Common.html#inf">inf</a></span>, <span class="id"><a href="CDF.Common.html#inf">inf</a></span> =&gt; <span class="id"><a href="CDF.Common.html#inf">inf</a></span><br/>
+&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Notation</span> <span class="string">"x &gt;= y"</span> := (<span class="id"><a href="CDF.Common.html#nati_le">nati_le</a></span> <span class="id">y</span> <span class="id">x</span>) : <span class="id">nati_scope</span>.<br/>
+<span class="kwd">Notation</span> <span class="string">"x &gt; y"</span> := (<span class="id"><a href="CDF.Common.html#nati_le">nati_le</a></span> <span class="id">y</span> <span class="id">x</span> /\ <span class="id">y</span> &lt;&gt; <span class="id">x</span>) : <span class="id">nati_scope</span>.<br/>
+<span class="kwd">Notation</span> <span class="string">"x &lt;= y"</span> := (<span class="id"><a href="CDF.Common.html#nati_le">nati_le</a></span> <span class="id">x</span> <span class="id">y</span>) : <span class="id">nati_scope</span>.<br/>
+<span class="kwd">Notation</span> <span class="string">"x + y"</span> := (<span class="id"><a href="CDF.Common.html#nati_plus">nati_plus</a></span> <span class="id">x</span> <span class="id">y</span>) : <span class="id">nati_scope</span>.<br/>
+<span class="id">Bind</span> <span class="kwd">Scope</span> <span class="id">nati_scope</span> <span class="kwd">with</span> <span class="id">nati</span>.<br/>
+<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">nat_scope</span>.<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="nati_plus_0">nati_plus_0</a></span> : <span class="kwd">forall</span> <span class="id">a</span>, (<span class="id">a</span> + 0)%<span class="id">nati</span> = <span class="id">a</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">intros</span>. <span class="id">destruct</span> <span class="id">a</span>.<br/>
+&nbsp;&nbsp;- <span class="id">simpl</span>. <span class="id">now</span> <span class="id">rewrite</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.add_0_r">Nat.add_0_r</a></span>.<br/>
+&nbsp;&nbsp;- <span class="id">simpl</span>. <span class="id">reflexivity</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="nati_0_plus">nati_0_plus</a></span> : <span class="kwd">forall</span> <span class="id">a</span>, (0 + <span class="id">a</span>)%<span class="id">nati</span> = <span class="id">a</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">intros</span>. <span class="id">destruct</span> <span class="id">a</span>.<br/>
+&nbsp;&nbsp;- <span class="id">now</span> <span class="id">simpl</span>.<br/>
+&nbsp;&nbsp;- <span class="id">simpl</span>. <span class="id">reflexivity</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="nati_le_move">nati_le_move</a></span> : <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span> <span class="id">c</span>,<br/>
+&nbsp;&nbsp;(<span class="id">c</span> &gt; 0)%<span class="id">nat</span> -&gt;<br/>
+&nbsp;&nbsp;(<span class="id">a</span> + <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> <span class="id">b</span> &lt;= <span class="id"><a href="CDF.Common.html#n">n</a></span> <span class="id">c</span> &lt;-&gt; <span class="id">a</span> + <span class="id">b</span> &lt;= <span class="id"><a href="https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.pred">Nat.pred</a></span> <span class="id">c</span>)%<span class="id">nati</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">destruct</span> <span class="id">a</span>.<br/>
+&nbsp;&nbsp;- <span class="id">induction</span> <span class="id">n0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">simpl</span>; <span class="id">split</span>; <span class="id">lia</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">split</span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;* <span class="id">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Peano.html#plus_n_Sm">plus_n_Sm</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> (<span class="id">IHn0</span> _ <span class="id">c</span>). <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Peano.html#plus_n_Sm">plus_n_Sm</a></span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">assumption</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;* <span class="id">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Peano.html#plus_n_Sm">plus_n_Sm</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">IHn0</span>. <span class="id">assumption</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Peano.html#plus_n_Sm">plus_n_Sm</a></span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">assumption</span>.<br/>
+&nbsp;&nbsp;- <span class="id">intuition</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="nati_ge_move">nati_ge_move</a></span> : <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span> <span class="id">c</span>,<br/>
+&nbsp;&nbsp;(<span class="id">c</span> &gt; 0)%<span class="id">nat</span> -&gt;<br/>
+&nbsp;&nbsp;(<span class="id">a</span> + <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> <span class="id">b</span> &gt;= <span class="id"><a href="CDF.Common.html#n">n</a></span> <span class="id">c</span> &lt;-&gt; <span class="id">a</span> + <span class="id">b</span> &gt;= <span class="id"><a href="https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.pred">Nat.pred</a></span> <span class="id">c</span>)%<span class="id">nati</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">destruct</span> <span class="id">a</span>.<br/>
+&nbsp;&nbsp;- <span class="id">induction</span> <span class="id">n0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">simpl</span>; <span class="id">split</span>; <span class="id">lia</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">split</span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;* <span class="id">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Peano.html#plus_n_Sm">plus_n_Sm</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> (<span class="id">IHn0</span> _ <span class="id">c</span>). <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Peano.html#plus_n_Sm">plus_n_Sm</a></span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">assumption</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;* <span class="id">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Peano.html#plus_n_Sm">plus_n_Sm</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">IHn0</span>. <span class="id">assumption</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Peano.html#plus_n_Sm">plus_n_Sm</a></span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">assumption</span>.<br/>
+&nbsp;&nbsp;- <span class="id">intuition</span>.<br/>
+Qed.</div></details>
+<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="geq_succ">geq_succ</a></span> : <span class="kwd">forall</span> <span class="id">m</span> <span class="id">n</span>, <span class="id">n</span> &gt;= <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> <span class="id">m</span> -&gt; <span class="id">n</span> &gt; 0.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">lia</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="nati_plus_le">nati_plus_le</a></span> : <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span> <span class="id">c</span>,<br/>
+&nbsp;&nbsp;(<span class="id">c</span> &gt;= <span class="id">b</span>)%<span class="id">nat</span> -&gt; (<span class="id">a</span> + <span class="id"><a href="CDF.Common.html#n">n</a></span> <span class="id">b</span> &lt;= <span class="id"><a href="CDF.Common.html#n">n</a></span> <span class="id">c</span> &lt;-&gt; <span class="id">a</span> &lt;= <span class="id">c</span> - <span class="id">b</span>)%<span class="id">nati</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">induction</span> <span class="id">b</span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;- <span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#nati_plus_0">nati_plus_0</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.sub_0_r">Nat.sub_0_r</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intuition</span>.<br/>
+&nbsp;&nbsp;- <span class="id">pose</span> <span class="id">proof</span> (<span class="id"><a href="CDF.Common.html#geq_succ">geq_succ</a></span> _ _ <span class="id">H</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">assert</span> (<span class="kwd">forall</span> <span class="id">b</span> <span class="id">c</span>, (<span class="id">c</span> &gt; 0)%<span class="id">nat</span> -&gt; (<span class="id">c</span> - <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> <span class="id">b</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.pred">Nat.pred</a></span> <span class="id">c</span> - <span class="id">b</span>))%<span class="id">nati</span>. <span class="id">lia</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#nati_le_move">nati_le_move</a></span>; <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">H1</span>; <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">IHb</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">lia</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="nati_plus_ge">nati_plus_ge</a></span> : <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span> <span class="id">c</span>,<br/>
+&nbsp;&nbsp;(<span class="id">c</span> &gt;= <span class="id">b</span>)%<span class="id">nat</span> -&gt; (<span class="id">a</span> + <span class="id"><a href="CDF.Common.html#n">n</a></span> <span class="id">b</span> &gt;= <span class="id"><a href="CDF.Common.html#n">n</a></span> <span class="id">c</span> &lt;-&gt; <span class="id">a</span> &gt;= <span class="id">c</span> - <span class="id">b</span>)%<span class="id">nati</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">induction</span> <span class="id">b</span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;- <span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#nati_plus_0">nati_plus_0</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.sub_0_r">Nat.sub_0_r</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">intuition</span>.<br/>
+&nbsp;&nbsp;- <span class="id">pose</span> <span class="id">proof</span> (<span class="id"><a href="CDF.Common.html#geq_succ">geq_succ</a></span> _ _ <span class="id">H</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">assert</span> (<span class="kwd">forall</span> <span class="id">b</span> <span class="id">c</span>, (<span class="id">c</span> &gt; 0)%<span class="id">nat</span> -&gt; (<span class="id">c</span> - <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> <span class="id">b</span> = <span class="id"><a href="https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.pred">Nat.pred</a></span> <span class="id">c</span> - <span class="id">b</span>))%<span class="id">nati</span>. <span class="id">lia</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Common.html#nati_ge_move">nati_ge_move</a></span>; <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">H1</span>; <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id">IHb</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">lia</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="nati_le_inf">nati_le_inf</a></span> : <span class="kwd">forall</span> <span class="id">a</span> <span class="id">n</span>,<br/>
+&nbsp;&nbsp;(<span class="id">a</span> + <span class="id">n</span> &lt;= <span class="id"><a href="CDF.Common.html#inf">inf</a></span> &lt;-&gt; <span class="id">a</span> &lt;= <span class="id"><a href="CDF.Common.html#inf">inf</a></span>)%<span class="id">nati</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">destruct</span> <span class="id">a</span>.<br/>
+&nbsp;&nbsp;- <span class="id">destruct</span> <span class="id"><a href="CDF.Common.html#n">n</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">simpl</span>. <span class="id">split</span>. <span class="id">easy</span>. <span class="id">destruct</span> <span class="id">n2</span>; <span class="id">easy</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">intros</span>. <span class="id">simpl</span>. <span class="id">split</span>. <span class="id">easy</span>. <span class="id">destruct</span> <span class="id">n1</span>; <span class="id">easy</span>.<br/>
+&nbsp;&nbsp;- <span class="id">simpl</span>. <span class="id">split</span>. <span class="id">easy</span>. <span class="id">destruct</span> <span class="id">n0</span>; <span class="id">easy</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="nati_le_inf_r">nati_le_inf_r</a></span> : <span class="kwd">forall</span> <span class="id">a</span> <span class="id">m</span>,<br/>
+&nbsp;&nbsp;(<span class="id">a</span> &lt;= <span class="id"><a href="CDF.Common.html#inf">inf</a></span> + <span class="id">m</span> &lt;-&gt; <span class="id">a</span> &lt;= <span class="id"><a href="CDF.Common.html#inf">inf</a></span>)%<span class="id">nati</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">destruct</span> <span class="id">a</span>.<br/>
+&nbsp;&nbsp;- <span class="id">destruct</span> <span class="id"><a href="CDF.Common.html#n">n</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">simpl</span>. <span class="id">split</span>. <span class="id">easy</span>. <span class="id">destruct</span> <span class="id">m</span>; <span class="id">easy</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">intros</span>. <span class="id">simpl</span>. <span class="id">split</span>. <span class="id">easy</span>. <span class="id">destruct</span> <span class="id">m</span>; <span class="id">easy</span>.<br/>
+&nbsp;&nbsp;- <span class="id">simpl</span>. <span class="id">split</span>. <span class="id">easy</span>. <span class="id">destruct</span> <span class="id">m</span>; <span class="id">easy</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="nati_le_antisymm">nati_le_antisymm</a></span> : <span class="kwd">forall</span> <span class="id">n</span> <span class="id">m</span>,<br/>
+&nbsp;&nbsp;(<span class="id">n</span> &lt;= <span class="id">m</span> -&gt; <span class="id">m</span> &lt;= <span class="id">n</span> -&gt; <span class="id">n</span> = <span class="id">m</span>)%<span class="id">nati</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">intros</span> <span class="id">n</span> <span class="id">m</span> <span class="id">H1</span> <span class="id">H2</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#nati_le">nati_le</a></span> <span class="kwd">in</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#nati_le">nati_le</a></span> <span class="kwd">in</span> <span class="id">H2</span>.<br/>
+&nbsp;&nbsp;<span class="id">destruct</span> <span class="id">n</span>; <span class="id">destruct</span> <span class="id">m</span>.<br/>
+&nbsp;&nbsp;- <span class="id">f_equal</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.le_antisymm">Nat.le_antisymm</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">auto</span>. <span class="id">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id">easy</span>.<br/>
+&nbsp;&nbsp;- <span class="id">easy</span>.<br/>
+&nbsp;&nbsp;- <span class="id">easy</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="nati_zero_smallest">nati_zero_smallest</a></span> : <span class="kwd">forall</span> <span class="id">a</span>, (0 &lt;= <span class="id">a</span>)%<span class="id">nati</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#nati_le">nati_le</a></span>. <span class="id">destruct</span> <span class="id">a</span>. <span class="id">lia</span>. <span class="id">easy</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="inf_greatest">inf_greatest</a></span> : <span class="kwd">forall</span> <span class="id">a</span>, (<span class="id">a</span> &lt;= <span class="id"><a href="CDF.Common.html#inf">inf</a></span>)%<span class="id">nati</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="CDF.Common.html#nati_le">nati_le</a></span>. <span class="id">destruct</span> <span class="id">a</span>; <span class="id">easy</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="inf_inf">inf_inf</a></span> : <span class="kwd">forall</span> <span class="id">a</span>,<br/>
+&nbsp;&nbsp;~ (<span class="id"><a href="CDF.Common.html#inf">inf</a></span> = <span class="id"><a href="CDF.Common.html#n">n</a></span> <span class="id">a</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">unfold</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#not">not</a></span>; <span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">inversion</span> <span class="id">H</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="is_inf">is_inf</a></span> : <span class="kwd">forall</span> <span class="id">a</span>, (<span class="id">a</span> &gt;= <span class="id"><a href="CDF.Common.html#inf">inf</a></span>)%<span class="id">nati</span> &lt;-&gt; <span class="id">a</span> = <span class="id"><a href="CDF.Common.html#inf">inf</a></span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">destruct</span> <span class="id">a</span>; <span class="id">easy</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="nati_n_ge_inf">nati_n_ge_inf</a></span> : <span class="kwd">forall</span> (<span class="id">a</span>:<span class="id"><a href="CDF.Common.html#nati">nati</a></span>) (<span class="id">n</span>:<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>),<br/>
+&nbsp;&nbsp;(<span class="id">a</span> + <span class="id">n</span> &gt;= <span class="id"><a href="CDF.Common.html#inf">inf</a></span> &lt;-&gt; <span class="id">a</span> = <span class="id"><a href="CDF.Common.html#inf">inf</a></span>)%<span class="id">nati</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">destruct</span> <span class="id">a</span>; <span class="id">easy</span>.<br/>
+Qed.</div></details>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</a></div>
+</body>
+</html>

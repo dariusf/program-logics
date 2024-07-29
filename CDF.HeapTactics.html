@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module HeapTactics</title>
+<meta name="description" content="Documentation of Coq module HeapTactics" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<h1 class="title">Module HeapTactics</h1>
+<div class="coq">
+<br/>
+<span class="kwd">From</span> <span class="id">CDF</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="CDF.Separation2.html">Separation2</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">Coq</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.FunctionalExtensionality.html">FunctionalExtensionality</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.PropExtensionality.html">PropExtensionality</a></span>.<br/>
+<br/>
+<span class="kwd">Ltac</span> <span class="id">HUNION</span> <span class="id">n</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">n</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#O">O</a></span> =&gt; <span class="id">idtac</span> <span class="string">"out of fuel"</span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> ?<span class="id">n'</span> =&gt;<br/>
+&nbsp;&nbsp;<span class="id">intuition</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">goal</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ <span class="id">H</span>: _ = <span class="id"><a href="CDF.Separation2.html#hunion">hunion</a></span> <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span> _ |- _ ] =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Separation2.html#hunion_empty">hunion_empty</a></span> <span class="kwd">in</span> <span class="id">H</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">HUNION</span> <span class="id">n'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ <span class="id">H</span>: _ = <span class="id"><a href="CDF.Separation2.html#hunion">hunion</a></span> _ <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span> |- _ ] =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Separation2.html#hunion_comm">hunion_comm</a></span> <span class="kwd">in</span> <span class="id">H</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">HDISJ</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Separation2.html#hunion_empty">hunion_empty</a></span> <span class="kwd">in</span> <span class="id">H</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">HUNION</span> <span class="id">n'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ |- _ = <span class="id"><a href="CDF.Separation2.html#hunion">hunion</a></span> <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span> _ ] =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Separation2.html#hunion_empty">hunion_empty</a></span>; <span class="id">HUNION</span> <span class="id">n'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id"><a href="CDF.Separation2.html#hunion">hunion</a></span> <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span> _ = _ ] =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Separation2.html#hunion_empty">hunion_empty</a></span>; <span class="id">HUNION</span> <span class="id">n'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ |- _ = <span class="id"><a href="CDF.Separation2.html#hunion">hunion</a></span> _ <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span> ] =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Separation2.html#hunion_comm">hunion_comm</a></span>; <span class="id">HDISJ</span>; <span class="id">rewrite</span> <span class="id"><a href="CDF.Separation2.html#hunion_empty">hunion_empty</a></span>; <span class="id">HUNION</span> <span class="id">n'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id"><a href="CDF.Separation2.html#hunion">hunion</a></span> _ <span class="id"><a href="CDF.Separation2.html#hempty">hempty</a></span> = _ ] =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Separation2.html#hunion_comm">hunion_comm</a></span>; <span class="id">HDISJ</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id"><a href="CDF.Separation2.html#hunion_empty">hunion_empty</a></span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">HUNION</span> <span class="id">n'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ |- ?<span class="id">g</span> ] =&gt; <span class="id">auto</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Ltac</span> <span class="id">heap</span> := <span class="id">HUNION</span> (3%<span class="id">nat</span>); <span class="id">HDISJ</span>; <span class="id">auto</span>.<br/>
+<br/>
+<span class="kwd">Ltac</span> <span class="id">pre_ext</span> :=<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.FunctionalExtensionality.html#functional_extensionality">functional_extensionality</a></span>; <span class="id">intros</span> <span class="id">s</span>;<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.FunctionalExtensionality.html#functional_extensionality">functional_extensionality</a></span>; <span class="id">intros</span> <span class="id">h</span>;<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.PropExtensionality.html#propositional_extensionality">propositional_extensionality</a></span>.<br/>
+<br/>
+<span class="kwd">Ltac</span> <span class="id">post_ext</span> :=<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.FunctionalExtensionality.html#functional_extensionality">functional_extensionality</a></span>; <span class="id">intros</span> <span class="id">r</span>;<br/>
+&nbsp;&nbsp;<span class="id">pre_ext</span>.<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</a></div>
+</body>
+</html>

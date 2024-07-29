@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module ShiftReset</title>
+<meta name="description" content="Documentation of Coq module ShiftReset" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<h1 class="title">Module ShiftReset</h1>
+<div class="coq">
+<br/>
+<span class="kwd">From</span> <span class="id">Coq</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.ZArith.html">ZArith</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.micromega.Lia.html">Lia</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Bool.Bool.html">Bool</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Lists.List.html">List</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html">String</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Program.Equality.html">Program.Equality</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">Coq</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.FunctionalExtensionality.html">FunctionalExtensionality</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.PropExtensionality.html">PropExtensionality</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">CDF</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="CDF.Common.html">Common</a></span> <span class="id"><a href="CDF.Sequences.html">Sequences</a></span> <span class="id"><a href="CDF.Separation2.html">Separation2</a></span> <span class="id"><a href="CDF.Tactics.html">Tactics</a></span>.<br/>
+<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">string_scope</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">Z_scope</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">list_scope</span>.<br/>
+<br/>
+<h1> Syntax </h1>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="expr">expr</a></span> : <span class="kwd">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eint">eint</a></span> (<span class="id">i</span>:<span class="id"><a href="https://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="elamb">elamb</a></span> (<span class="id">x</span>:<span class="id"><a href="CDF.Common.html#ident">ident</a></span>) (<span class="id">e</span>:<span class="id">expr</span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="evar">evar</a></span> (<span class="id">x</span>:<span class="id"><a href="CDF.Common.html#ident">ident</a></span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eapp">eapp</a></span> (<span class="id">f</span>:<span class="id"><a href="CDF.Common.html#ident">ident</a></span>) (<span class="id">x</span>:<span class="id"><a href="CDF.Common.html#ident">ident</a></span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="elet">elet</a></span> (<span class="id">x</span>:<span class="id"><a href="CDF.Common.html#ident">ident</a></span>) (<span class="id">e1</span>:<span class="id">expr</span>) (<span class="id">e2</span>:<span class="id">expr</span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eassert">eassert</a></span> (<span class="id">x</span>:<span class="id"><a href="CDF.Separation2.html#assertion">assertion</a></span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eif">eif</a></span> (<span class="id">x</span>:<span class="id"><a href="CDF.Common.html#ident">ident</a></span>) (<span class="id">e1</span>:<span class="id">expr</span>) (<span class="id">e2</span>:<span class="id">expr</span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eshift">eshift</a></span> (<span class="id">e</span>:<span class="id"><a href="CDF.Common.html#ident">ident</a></span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="ereset">ereset</a></span> (<span class="id">e</span>:<span class="id">expr</span>).<br/>
+<br/>
+<h1> Model </h1>
+<br/>
+<div class="doc">Values occur at runtime and may not have a corresponding syntax. </div>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="val">val</a></span> : <span class="kwd">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="vloc">vloc</a></span> (<span class="id">i</span>:<span class="id"><a href="https://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="vint">vint</a></span> (<span class="id">i</span>:<span class="id"><a href="https://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="vclos">vclos</a></span> (<span class="id">x</span>:<span class="id"><a href="CDF.Common.html#ident">ident</a></span>) (<span class="id">e</span>:<span class="id"><a href="CDF.ShiftReset.html#expr">expr</a></span>) (<span class="id">s</span>:<span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id">val</span>).<br/>
+<br/>
+<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="store">store</a></span> := <span class="id"><a href="CDF.Common.html#store">store</a></span> <span class="id"><a href="CDF.ShiftReset.html#val">val</a></span>.<br/>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="eresult">eresult</a></span> : <span class="kwd">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="resshift">resshift</a></span> (<span class="id">ve</span>:<span class="id"><a href="CDF.ShiftReset.html#expr">expr</a></span>) (<span class="id">vl</span>:<span class="id"><a href="CDF.ShiftReset.html#expr">expr</a></span>)<br/>
+&nbsp;&nbsp;| <span class="id"><a name="resbot">resbot</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="resnorm">resnorm</a></span> (<span class="id">v</span>:<span class="id"><a href="CDF.ShiftReset.html#val">val</a></span>).<br/>
+<br/>
+<h1> Big-step semantics </h1>
+<br/>
+<span class="kwd">Reserved</span> <span class="kwd">Notation</span> <span class="string">" 'eval[' s ',' h ',' e ']' '=&gt;' '[' s1 ',' h1 ',' r ']' "</span> (<span class="kwd">at</span> <span class="id">level</span> 50, <span class="id">left</span> <span class="id">associativity</span>).<br/>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="bigstep">bigstep</a></span> : <span class="id"><a href="CDF.ShiftReset.html#store">store</a></span> -&gt; <span class="id"><a href="CDF.Separation2.html#heap">heap</a></span> -&gt; <span class="id"><a href="CDF.ShiftReset.html#expr">expr</a></span> -&gt; <span class="id"><a href="CDF.ShiftReset.html#store">store</a></span> -&gt; <span class="id"><a href="CDF.Separation2.html#heap">heap</a></span> -&gt; <span class="id"><a href="CDF.ShiftReset.html#eresult">eresult</a></span> -&gt; <span class="kwd">Prop</span> :=<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_int">eval_int</a></span> : <span class="kwd">forall</span> <span class="id">s</span> <span class="id">h</span> <span class="id">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#eint">eint</a></span> <span class="id">i</span> ]=&gt;[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#resnorm">resnorm</a></span> (<span class="id"><a href="CDF.ShiftReset.html#vint">vint</a></span> <span class="id">i</span>) ]<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_lamb">eval_lamb</a></span> : <span class="kwd">forall</span> <span class="id">s</span> <span class="id">h</span> <span class="id">x</span> <span class="id">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#elamb">elamb</a></span> <span class="id">x</span> <span class="id">e</span> ]=&gt;[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#resnorm">resnorm</a></span> (<span class="id"><a href="CDF.ShiftReset.html#vclos">vclos</a></span> <span class="id">x</span> <span class="id">e</span> <span class="id">s</span>) ]<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_var">eval_var</a></span> : <span class="kwd">forall</span> <span class="id">s</span> <span class="id">h</span> <span class="id">x</span> <span class="id">v</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> = <span class="id">s</span> <span class="id">x</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#evar">evar</a></span> <span class="id">x</span> ]=&gt;[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#resnorm">resnorm</a></span> <span class="id">v</span> ]<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_app">eval_app</a></span> : <span class="kwd">forall</span> <span class="id">f</span> <span class="id">x</span> <span class="id">y</span> <span class="id">e</span> <span class="id">v</span> <span class="id">s</span> <span class="id">h</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">r</span> <span class="id">sf</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="CDF.ShiftReset.html#vclos">vclos</a></span> <span class="id">y</span> <span class="id">e</span> <span class="id">sf</span>) = <span class="id">s</span> <span class="id">f</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> = <span class="id">s</span> <span class="id">x</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">f</span> (<span class="id"><a href="CDF.ShiftReset.html#vclos">vclos</a></span> <span class="id">y</span> <span class="id">e</span> <span class="id">sf</span>) (<span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">y</span> <span class="id">v</span> <span class="id">sf</span>), <span class="id">h</span>, <span class="id">e</span> ] =&gt; [ <span class="id">s1</span>, <span class="id">h1</span>, <span class="id">r</span> ] -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#eapp">eapp</a></span> <span class="id">f</span> <span class="id">x</span> ] =&gt; [ <span class="id">s</span>, <span class="id">h1</span>, <span class="id">r</span> ]<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_let">eval_let</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">e1</span> <span class="id">e2</span> <span class="id">v</span> <span class="id">s</span> <span class="id">h</span> <span class="id">h2</span> <span class="id">s2</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">r</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id">e1</span> ] =&gt; [ <span class="id">s1</span>, <span class="id">h1</span>, <span class="id"><a href="CDF.ShiftReset.html#resnorm">resnorm</a></span> <span class="id">v</span> ] -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id"><a href="CDF.Common.html#supdate">supdate</a></span> <span class="id">x</span> <span class="id">v</span> <span class="id">s1</span>, <span class="id">h1</span>, <span class="id">e2</span> ] =&gt; [ <span class="id">s2</span>, <span class="id">h2</span>, <span class="id">r</span> ] -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#elet">elet</a></span> <span class="id">x</span> <span class="id">e1</span> <span class="id">e2</span> ] =&gt; [ <span class="id"><a href="CDF.Common.html#sremove">sremove</a></span> <span class="id">x</span> <span class="id">s2</span>, <span class="id">h2</span>, <span class="id">r</span> ]<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_ift">eval_ift</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">e1</span> <span class="id">e2</span> <span class="id">s</span> <span class="id">h</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">r</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="CDF.ShiftReset.html#vint">vint</a></span> 0) = <span class="id">s</span> <span class="id">x</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id">e1</span> ] =&gt; [ <span class="id">s1</span>, <span class="id">h1</span>, <span class="id">r</span> ] -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#eif">eif</a></span> <span class="id">x</span> <span class="id">e1</span> <span class="id">e2</span> ] =&gt; [ <span class="id">s1</span>, <span class="id">h1</span>, <span class="id">r</span> ]<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_iff">eval_iff</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">e1</span> <span class="id">e2</span> <span class="id">s</span> <span class="id">h</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">r</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="CDF.ShiftReset.html#vint">vint</a></span> 0) &lt;&gt; <span class="id">s</span> <span class="id">x</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id">e2</span> ] =&gt; [ <span class="id">s1</span>, <span class="id">h1</span>, <span class="id">r</span> ] -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#eif">eif</a></span> <span class="id">x</span> <span class="id">e1</span> <span class="id">e2</span> ] =&gt; [ <span class="id">s1</span>, <span class="id">h1</span>, <span class="id">r</span> ]<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_shift">eval_shift</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">e</span> <span class="id">b</span> <span class="id">s</span> <span class="id">h</span> <span class="id">y</span> <span class="id">sf</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="CDF.ShiftReset.html#vclos">vclos</a></span> <span class="id">x</span> <span class="id">e</span> <span class="id">sf</span>) = <span class="id">s</span> <span class="id">b</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#eshift">eshift</a></span> <span class="id">b</span> ] =&gt; [ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#resshift">resshift</a></span> (<span class="id"><a href="CDF.ShiftReset.html#elamb">elamb</a></span> <span class="id">x</span> <span class="id">e</span>) (<span class="id"><a href="CDF.ShiftReset.html#elamb">elamb</a></span> <span class="id">y</span> (<span class="id"><a href="CDF.ShiftReset.html#evar">evar</a></span> <span class="id">y</span>)) ]<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_letshift">eval_letshift</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">e1</span> <span class="id">e2</span> <span class="id">s</span> <span class="id">h</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">r</span> <span class="id">el</span> <span class="id">vl</span> <span class="id">z</span> <span class="id">f</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id">e1</span> ] =&gt; [ <span class="id">s1</span>, <span class="id">h1</span>, <span class="id"><a href="CDF.ShiftReset.html#resshift">resshift</a></span> <span class="id">el</span> <span class="id">vl</span> ] -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">r</span> = <span class="id"><a href="CDF.ShiftReset.html#resshift">resshift</a></span> <span class="id">el</span> (<span class="id"><a href="CDF.ShiftReset.html#elamb">elamb</a></span> <span class="id">z</span> (<span class="id"><a href="CDF.ShiftReset.html#elet">elet</a></span> <span class="id">z</span> (<span class="id"><a href="CDF.ShiftReset.html#elet">elet</a></span> <span class="id">f</span> <span class="id">vl</span> (<span class="id"><a href="CDF.ShiftReset.html#eapp">eapp</a></span> <span class="id">f</span> <span class="id">z</span>)) <span class="id">e2</span>)) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#elet">elet</a></span> <span class="id">x</span> <span class="id">e1</span> <span class="id">e2</span> ] =&gt; [ <span class="id">s1</span>, <span class="id">h1</span>, <span class="id">r</span> ]<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_resetshift">eval_resetshift</a></span> : <span class="kwd">forall</span> <span class="id">e</span> <span class="id">s</span> <span class="id">h</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">s2</span> <span class="id">h2</span> <span class="id">r</span> <span class="id">el</span> <span class="id">vl</span> <span class="id">f</span> <span class="id">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id">e</span> ] =&gt; [ <span class="id">s1</span>, <span class="id">h1</span>, <span class="id"><a href="CDF.ShiftReset.html#resshift">resshift</a></span> <span class="id">el</span> <span class="id">vl</span> ] -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#ereset">ereset</a></span> (<span class="id"><a href="CDF.ShiftReset.html#elet">elet</a></span> <span class="id">f</span> <span class="id">el</span> (<span class="id"><a href="CDF.ShiftReset.html#elet">elet</a></span> <span class="id">x</span> <span class="id">vl</span> (<span class="id"><a href="CDF.ShiftReset.html#eapp">eapp</a></span> <span class="id">f</span> <span class="id">x</span>))) ] =&gt; [ <span class="id">s2</span>, <span class="id">h2</span>, <span class="id">r</span> ] -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#ereset">ereset</a></span> <span class="id">e</span> ] =&gt; [ <span class="id">s2</span>, <span class="id">h2</span>, <span class="id">r</span> ]<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="eval_resetval">eval_resetval</a></span> : <span class="kwd">forall</span> <span class="id">e</span> <span class="id">s</span> <span class="id">h</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">v</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id">e</span> ] =&gt; [ <span class="id">s1</span>, <span class="id">h1</span>, <span class="id"><a href="CDF.ShiftReset.html#resnorm">resnorm</a></span> <span class="id">v</span> ] -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eval</span>[ <span class="id">s</span>, <span class="id">h</span>, <span class="id"><a href="CDF.ShiftReset.html#ereset">ereset</a></span> <span class="id">e</span> ] =&gt; [ <span class="id">s1</span>, <span class="id">h1</span>, <span class="id"><a href="CDF.ShiftReset.html#resnorm">resnorm</a></span> <span class="id">v</span> ]<br/>
+<br/>
+<span class="kwd">where</span> <span class="string">" 'eval[' s ',' h ',' e ']' '=&gt;' '[' s1 ',' h1 ',' r ']' "</span> := (<span class="id"><a href="CDF.ShiftReset.html#bigstep">bigstep</a></span> <span class="id">s</span> <span class="id">h</span> <span class="id">e</span> <span class="id">s1</span> <span class="id">h1</span> <span class="id">r</span>).<br/>
+<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="ProgramExamples">ProgramExamples</a></span>.<br/>
+<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="CDF.ShiftReset.html#ProgramExamples">ProgramExamples</a></span>.<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</a></div>
+</body>
+</html>

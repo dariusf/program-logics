@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Biabduction</title>
+<meta name="description" content="Documentation of Coq module Biabduction" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<h1 class="title">Module Biabduction</h1>
+<div class="coq">
+<br/>
+<span class="kwd">From</span> <span class="id">Coq</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.ZArith.html">ZArith</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.micromega.Lia.html">Lia</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Bool.Bool.html">Bool</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Lists.List.html">List</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Strings.String.html">String</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Program.Equality.html">Program.Equality</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">Coq</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.FunctionalExtensionality.html">FunctionalExtensionality</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Logic.PropExtensionality.html">PropExtensionality</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">CDF</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="CDF.Common.html">Common</a></span> <span class="id"><a href="CDF.Sequences.html">Sequences</a></span> <span class="id"><a href="CDF.Separation2.html">Separation2</a></span> <span class="id"><a href="CDF.Tactics.html">Tactics</a></span>.<br/>
+<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">string_scope</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">Z_scope</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">list_scope</span>.<br/>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="split">split</a></span> : <span class="id"><a href="CDF.Separation2.html#assertion">assertion</a></span> -&gt; <span class="id"><a href="CDF.Separation2.html#assertion">assertion</a></span> -&gt; <span class="id"><a href="CDF.Separation2.html#assertion">assertion</a></span> -&gt; <span class="kwd">Prop</span> :=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="split_one">split_one</a></span> : <span class="kwd">forall</span> <span class="id">h2</span> <span class="id">x</span> <span class="id">y</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">split</span> (<span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> <span class="id">x</span> <span class="id">y</span> ** <span class="id">h2</span>) (<span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> <span class="id">x</span> <span class="id">y</span>) <span class="id">h2</span><br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="split_next">split_next</a></span> : <span class="kwd">forall</span> <span class="id">h2</span> <span class="id">x</span> <span class="id">y</span> <span class="id">h</span> <span class="id">h1</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">split</span> <span class="id">h1</span> <span class="id">h</span> <span class="id">h2</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">split</span> (<span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> <span class="id">x</span> <span class="id">y</span> ** <span class="id">h2</span>) <span class="id">h</span> <span class="id">h2</span><br/>
+.<br/>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="biab">biab</a></span> : <span class="id"><a href="CDF.Separation2.html#assertion">assertion</a></span> -&gt; <span class="id"><a href="CDF.Separation2.html#assertion">assertion</a></span> -&gt; <span class="id"><a href="CDF.Separation2.html#assertion">assertion</a></span> -&gt; <span class="kwd">Prop</span> :=<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="biab_base">biab_base</a></span> : <span class="kwd">forall</span> <span class="id">s</span> <span class="id">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">biab</span> <span class="id">s</span> <span class="id">m</span> (<span class="id"><a href="CDF.Separation2.html#pure">pure</a></span> <span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>)<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="biab_missing">biab_missing</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> <span class="id">a</span> <span class="id">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">biab</span> <span class="id"><a href="CDF.Separation2.html#emp">emp</a></span> ((<span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> <span class="id">x</span> <span class="id">y</span>) ** <span class="id">m</span>) ((<span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> <span class="id">x</span> <span class="id">y</span>) ** <span class="id">a</span>)<br/>
+<br/>
+&nbsp;&nbsp;| <span class="id"><a name="biab_match">biab_match</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> <span class="id">z</span> <span class="id">a</span> <span class="id">b</span> <span class="id">m</span> <span class="id">m1</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">biab</span> <span class="id">b</span> <span class="id">m</span> <span class="id">a</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">z</span> = <span class="id">y</span>) //\\ <span class="id">m</span> = <span class="id">m1</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">biab</span> ((<span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> <span class="id">x</span> <span class="id">z</span>) ** <span class="id">b</span>) <span class="id">m1</span> ((<span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> <span class="id">x</span> <span class="id">y</span>) ** <span class="id">a</span>)<br/>
+.<br/>
+<br/>
+<span class="kwd">Example</span> <span class="id"><a name="ex1">ex1</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> <span class="id">a</span> <span class="id">b</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="CDF.Biabduction.html#biab">biab</a></span> (<span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> <span class="id">x</span> <span class="id">y</span> ** <span class="id"><a href="CDF.Separation2.html#emp">emp</a></span>) (<span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> <span class="id">a</span> <span class="id">b</span>) (<span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> <span class="id">x</span> <span class="id">y</span> ** <span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> <span class="id">a</span> <span class="id">b</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+&nbsp;&nbsp;<span class="id">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span> <span class="id"><a href="CDF.Biabduction.html#biab_match">biab_match</a></span> <span class="kwd">with</span> (<span class="id">m</span> := <span class="id"><a href="CDF.Separation2.html#pts">pts</a></span> <span class="id">a</span> <span class="id">b</span>).<br/>
+Admitted.</div></details>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</a></div>
+</body>
+</html>

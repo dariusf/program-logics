@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html class="alectryon-standalone"><head><title>HeapTactics.v</title><meta charset="utf-8"><meta content="Alectryon" name="generator"><meta name="viewport" content="width=device-width, initial-scale=1"><link href="alectryon.css" rel="stylesheet"><link href="pygments.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/IBM-type/0.5.4/css/ibm-type.min.css" integrity="sha512-sky5cf9Ts6FY1kstGOBHSybfKqdHR41M0Ldb0BjNiv3ifltoQIsg0zIaQ+wwdwgQ0w9vKFW7Js50lxH9vqNSSw==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/firacode/5.2.0/fira_code.min.css" integrity="sha512-MbysAYimH1hH2xYzkkMHB6MqxBqfP0megxsCLknbYqHVwXTCg9IqHbk+ZP/vnhO8UEW6PaXAkKe2vQ+SWACxxA==" crossorigin="anonymous" /><script src="alectryon.js"></script></head><body><article class="alectryon-root alectryon-centered alectryon-coqdoc"><div class="alectryon-banner">Built with <a href="https://github.com/cpitclaudel/alectryon/">Alectryon</a>, running Coq+SerAPI v8.19.0+0.19.3. Bubbles (<span class="alectryon-bubble"></span>) indicate interactive fragments: hover for details, tap to reveal contents. Use <kbd>Ctrl+↑</kbd> <kbd>Ctrl+↓</kbd> to navigate, <kbd>Ctrl+🖱️</kbd> to focus. On Mac, use <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>.</div><pre class="alectryon-io highlight"><!-- Generator: Alectryon --><span class="alectryon-sentence"><input class="alectryon-toggle" id="HeapTactics-v-chk0" style="display: none" type="checkbox"><label class="alectryon-input" for="HeapTactics-v-chk0"><span class="kn">From</span> CDF <span class="kn">Require Import</span> Separation2.</label><small class="alectryon-output"><div><div class="alectryon-messages"><blockquote class="alectryon-message">[Loading ML file ring_plugin.cmxs (<span class="nb">using</span> legacy method) ... <span class="bp">done</span>]</blockquote><blockquote class="alectryon-message">[Loading ML file zify_plugin.cmxs (<span class="nb">using</span> legacy method) ... <span class="bp">done</span>]</blockquote><blockquote class="alectryon-message">[Loading ML file micromega_plugin.cmxs (<span class="nb">using</span> legacy method) ... <span class="bp">done</span>]</blockquote><blockquote class="alectryon-message">[Loading ML file btauto_plugin.cmxs (<span class="nb">using</span> legacy method) ... <span class="bp">done</span>]</blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">From</span> Coq <span class="kn">Require Import</span> FunctionalExtensionality PropExtensionality.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Ltac</span> <span class="nf">HUNION</span> n :=
+  <span class="kr">match</span> n <span class="kr">with</span>
+  | O =&gt; <span class="kp">idtac</span> <span class="s2">&quot;out of fuel&quot;</span>
+  | S <span class="nl">?n&#39;</span> =&gt;
+  <span class="nb">intuition</span>;
+    <span class="kr">match goal with</span>
+    | [ H: _ = hunion hempty _ |- _ ] =&gt;
+    <span class="c">(* let t := type of H in idtac &quot;empty&quot; t n&#39;; *)</span>
+        <span class="nb">rewrite</span> hunion_empty <span class="kr">in</span> H;
+        HUNION n&#39;
+    | [ H: _ = hunion _ hempty |- _ ] =&gt;
+        <span class="nb">rewrite</span> hunion_comm <span class="kr">in</span> H;
+        HDISJ;
+        <span class="nb">rewrite</span> hunion_empty <span class="kr">in</span> H;
+        HUNION n&#39;
+    | [ |- _ = hunion hempty _ ] =&gt;
+        <span class="nb">rewrite</span> hunion_empty; HUNION n&#39;
+    | [ |- hunion hempty _ = _ ] =&gt;
+        <span class="nb">rewrite</span> hunion_empty; HUNION n&#39;
+    | [ |- _ = hunion _ hempty ] =&gt;
+        <span class="nb">rewrite</span> hunion_comm; HDISJ; <span class="nb">rewrite</span> hunion_empty; HUNION n&#39;
+    | [ |- hunion _ hempty = _ ] =&gt;
+        <span class="nb">rewrite</span> hunion_comm; HDISJ;
+        <span class="nb">rewrite</span> hunion_empty;
+        HUNION n&#39;
+    | [ |- <span class="nl">?g</span> ] =&gt; <span class="nb">auto</span>
+    <span class="kr">end</span>
+  <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+<span class="c">(* TODO try autorewrite *)</span>
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Ltac</span> <span class="nf">heap</span> := HUNION (<span class="mi">3</span>%nat); HDISJ; <span class="nb">auto</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Ltac</span> <span class="nf">pre_ext</span> :=
+  <span class="nb">apply</span> functional_extensionality; <span class="nb">intros</span> s;
+  <span class="nb">apply</span> functional_extensionality; <span class="nb">intros</span> h;
+  <span class="nb">apply</span> propositional_extensionality.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Ltac</span> <span class="nf">post_ext</span> :=
+  <span class="nb">apply</span> functional_extensionality; <span class="nb">intros</span> r;
+  pre_ext.</span></span></pre></article></body></html>
